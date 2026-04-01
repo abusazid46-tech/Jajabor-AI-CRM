@@ -662,8 +662,8 @@
         // ============================================
         // CONFIGURATION
         // ============================================
-        const API_URL = 'https://script.google.com/macros/s/AKfycbzjdDcEjN6XpPHr6igbdOidRq28wvMJlN3uNocgSsjXoamvXs5Y9KZ6kDXYfK5x6Qy-/exec';
-        const API_KEY = 'jajabor-crm-2026-secure-key'; // Simple API key for protection
+        const API_URL = 'https://script.google.com/macros/s/AKfycbwWr3Y4E4BChztf5J0owmNscxpKMtbATn_8GWTVGZFqbrEHxBBqjbKuY0H52Is7fz2Q/exec';
+const API_KEY = 'jajabor-crm-2026-secure-key';
         
         // State Management
         let state = {
@@ -746,44 +746,68 @@
         // ============================================
         // API FUNCTIONS (SECURE)
         // ============================================
+      
+        async function callAPI(action, data = {}) {
+    try {
+        const payload = {
+            action: action,
+            apiKey: API_KEY,
+            ...data
+        };
         
-        async function callAPI(action, data = {}, method = 'POST') {
-            try {
-                const body = {
-                    action: action,
-                    apiKey: API_KEY,
-                    token: state.currentUser?.token,
-                    ...data
-                };
-                
-                const response = await fetch(API_URL, {
-                    method: method,
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body)
-                });
-                
-                const result = await response.json();
-                if (!result.success && result.message === 'Invalid token') {
-                    showNotification('Session expired. Please login again.', 'error');
-                    logout();
-                }
-                return result;
-            } catch (error) {
-                console.error('API Error:', error);
-                showNotification('Network error. Please check your connection.', 'error');
-                throw error;
-            }
+        // Add token if user is logged in
+        if (state.currentUser?.token) {
+            payload.token = state.currentUser.token;
         }
         
-        async function login(username, password) {
-            const result = await callAPI('login', { username, password });
-            if (result.success) {
-                state.currentUser = result.data;
-                localStorage.setItem('crmUser', JSON.stringify(state.currentUser));
-                return true;
-            }
-            return false;
+        console.log('Sending request:', { action, data: payload });
+        
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
+        const result = await response.json();
+        console.log('API Response:', result);
+        
+        if (!result.success && result.message === 'Invalid token') {
+            showNotification('Session expired. Please login again.', 'error');
+            logout();
+        }
+        
+        return result;
+    } catch (error) {
+        console.error('API Error:', error);
+        showNotification('Network error: ' + error.message, 'error');
+        throw error;
+    }
+}
+
+// Updated login function
+async function login(username, password) {
+    try {
+        const result = await callAPI('login', { username, password });
+        if (result.success) {
+            state.currentUser = result.data;
+            localStorage.setItem('crmUser', JSON.stringify(state.currentUser));
+            return true;
+        }
+        showNotification(result.message, 'error');
+        return false;
+    } catch (error) {
+        console.error('Login error:', error);
+        showNotification('Login failed. Please try again.', 'error');
+        return false;
+    }
+}
         
         async function fetchLeads(page = 1) {
             showLoading(true);
