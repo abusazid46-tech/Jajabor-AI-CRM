@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Jajabor AI CRM - Fast Edition</title>
+    <title>Jajabor AI CRM - Telesales Management System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -13,7 +13,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
         }
@@ -28,22 +28,36 @@
         }
 
         .login-card {
-            background: #fff;
+            background: white;
             border-radius: 20px;
             padding: 40px;
             width: 100%;
             max-width: 400px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
 
         .login-card h2 {
             text-align: center;
-            margin-bottom: 30px;
             color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .login-card .logo {
+            text-align: center;
+            font-size: 48px;
+            margin-bottom: 20px;
         }
 
         .input-group {
             margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
         }
 
         .input-group input {
@@ -52,15 +66,22 @@
             border: 2px solid #e0e0e0;
             border-radius: 10px;
             font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
         }
 
         .login-btn {
             width: 100%;
             padding: 12px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #fff;
+            color: white;
             border: none;
             border-radius: 10px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.2s;
@@ -68,11 +89,6 @@
 
         .login-btn:hover {
             transform: translateY(-2px);
-        }
-
-        .login-btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
         }
 
         /* Main App */
@@ -86,16 +102,15 @@
             top: 0;
             height: 100%;
             width: 260px;
-            background: #fff;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            transition: transform 0.3s;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: all 0.3s;
         }
 
         .sidebar-header {
             padding: 20px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #fff;
+            color: white;
             text-align: center;
         }
 
@@ -138,27 +153,29 @@
         }
 
         .top-bar {
-            background: #fff;
+            background: white;
             padding: 15px 20px;
             border-radius: 10px;
             margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
         .logout-btn {
             padding: 8px 15px;
             background: #ff4757;
-            color: #fff;
+            color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .logout-btn:hover {
-            transform: scale(1.05);
         }
 
         /* Dashboard Cards */
@@ -170,15 +187,10 @@
         }
 
         .stat-card {
-            background: #fff;
+            background: white;
             padding: 20px;
             border-radius: 15px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
         .stat-card h4 {
@@ -189,16 +201,17 @@
 
         .stat-card .number {
             font-size: 32px;
-            font-weight: 700;
+            font-weight: bold;
             color: #333;
         }
 
         /* Tables */
         .lead-table-container {
-            background: #fff;
+            background: white;
             border-radius: 15px;
             padding: 20px;
             overflow-x: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
         table {
@@ -218,33 +231,26 @@
             color: #555;
         }
 
-        tr:hover {
-            background: #f8f9fa;
-        }
-
-        /* Priority Colors */
         .priority-hot {
             color: #ff4757;
-            font-weight: 700;
+            font-weight: bold;
         }
 
         .priority-warm {
             color: #ffa502;
-            font-weight: 700;
+            font-weight: bold;
         }
 
         .priority-cold {
             color: #1e90ff;
-            font-weight: 700;
+            font-weight: bold;
         }
 
-        /* Status Badges */
         .status-badge {
             padding: 4px 8px;
             border-radius: 5px;
             font-size: 12px;
             font-weight: 600;
-            display: inline-block;
         }
 
         .status-new { background: #e0e0e0; color: #666; }
@@ -254,11 +260,9 @@
         .status-callback { background: #f39c1220; color: #f39c12; }
         .status-closed { background: #95a5a620; color: #95a5a6; }
 
-        /* Buttons */
         .action-buttons {
             display: flex;
-            gap: 5px;
-            flex-wrap: wrap;
+            gap: 8px;
         }
 
         .btn-icon {
@@ -274,86 +278,27 @@
             transform: scale(1.05);
         }
 
-        .btn-edit { background: #3498db; color: #fff; }
-        .btn-delete { background: #e74c3c; color: #fff; }
-        .btn-call { background: #2ecc71; color: #fff; }
-        .btn-whatsapp { background: #25D366; color: #fff; }
-
-        /* Quick Actions */
-        .quick-actions {
-            display: flex;
-            gap: 5px;
-            margin-top: 5px;
-            flex-wrap: wrap;
+        .btn-edit {
+            background: #3498db;
+            color: white;
         }
 
-        .quick-btn {
-            padding: 3px 6px;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 10px;
-            font-weight: 500;
-            transition: transform 0.2s;
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
         }
 
-        .quick-btn:hover {
-            transform: scale(1.05);
+        .btn-call {
+            background: #2ecc71;
+            color: white;
         }
 
-        .quick-btn-interested { background: #2ecc71; color: #fff; }
-        .quick-btn-not-interested { background: #e74c3c; color: #fff; }
-        .quick-btn-callback { background: #f39c12; color: #fff; }
-
-        /* Filters */
-        .filters-bar {
-            background: #fff;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
+        .btn-whatsapp {
+            background: #25D366;
+            color: white;
         }
 
-        .filters-bar select,
-        .filters-bar input {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-
-        /* Pagination */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
-            align-items: center;
-        }
-
-        .pagination button {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            background: #667eea;
-            color: #fff;
-            transition: transform 0.2s;
-        }
-
-        .pagination button:hover:not(:disabled) {
-            transform: scale(1.05);
-        }
-
-        .pagination button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-
-        /* Modal */
+        /* Forms */
         .modal {
             display: none;
             position: fixed;
@@ -361,15 +306,15 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0,0,0,0.5);
             justify-content: center;
             align-items: center;
-            z-index: 2000;
+            z-index: 1000;
         }
 
         .modal-content {
-            background: #fff;
-            padding: 25px;
+            background: white;
+            padding: 30px;
             border-radius: 15px;
             width: 90%;
             max-width: 500px;
@@ -381,9 +326,14 @@
             margin-bottom: 15px;
         }
 
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
             width: 100%;
             padding: 10px;
             border: 2px solid #e0e0e0;
@@ -391,79 +341,47 @@
             font-size: 14px;
         }
 
-        /* Notifications */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 12px 20px;
-            border-radius: 8px;
-            color: #fff;
-            z-index: 3000;
-            animation: slideIn 0.3s ease;
-        }
-
-        .notification-success { background: #2ecc71; }
-        .notification-error { background: #e74c3c; }
-        .notification-info { background: #3498db; }
-
-        /* Loader */
-        .loader {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #667eea;
-            border-radius: 50%;
-            animation: spin 0.5s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        /* Mobile Cards */
-        .lead-cards {
-            display: none;
+        .form-actions {
+            display: flex;
             gap: 10px;
-            flex-direction: column;
+            margin-top: 20px;
         }
 
-        .lead-card {
-            background: #fff;
+        .btn-primary {
+            flex: 1;
+            padding: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .btn-secondary {
+            flex: 1;
+            padding: 10px;
+            background: #95a5a6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* Filters */
+        .filters-bar {
+            background: white;
+            padding: 15px;
             border-radius: 10px;
-            padding: 12px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        }
-
-        .lead-card-header {
+            margin-bottom: 20px;
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-
-        .lead-card-name {
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        .lead-card-phone {
-            color: #666;
-            font-family: monospace;
-            margin-bottom: 8px;
-        }
-
-        .lead-card-badges {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 8px;
+            gap: 10px;
             flex-wrap: wrap;
+        }
+
+        .filters-bar select, .filters-bar input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
 
         /* Responsive */
@@ -477,36 +395,33 @@
             .main-content {
                 margin-left: 0;
             }
-            .lead-table-container {
-                display: none;
-            }
-            .lead-cards {
-                display: flex;
-            }
             .stats-grid {
                 grid-template-columns: 1fr;
             }
-            .filters-bar {
-                flex-direction: column;
-            }
-            .filters-bar select,
-            .filters-bar input {
-                width: 100%;
-            }
         }
 
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
+        .alert {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
         }
 
-        @media (max-width: 768px) {
-            .mobile-menu-btn {
-                display: block;
-            }
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Phone number formatting */
+        .phone-number {
+            font-family: monospace;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -514,14 +429,16 @@
     <!-- Login Page -->
     <div id="loginPage" class="login-container">
         <div class="login-card">
-            <div style="text-align: center; font-size: 48px;">🚀</div>
+            <div class="logo">🚀</div>
             <h2>Jajabor AI CRM</h2>
             <form id="loginForm">
                 <div class="input-group">
-                    <input type="text" id="username" placeholder="Username" required>
+                    <label>Username</label>
+                    <input type="text" id="username" required>
                 </div>
                 <div class="input-group">
-                    <input type="password" id="password" placeholder="Password" required>
+                    <label>Password</label>
+                    <input type="password" id="password" required>
                 </div>
                 <button type="submit" class="login-btn">Login</button>
             </form>
@@ -533,7 +450,7 @@
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <h3>Jajabor AI</h3>
-                <small>Fast CRM</small>
+                <small>Telesales CRM</small>
             </div>
             <div class="sidebar-menu">
                 <div class="menu-item active" data-page="dashboard">
@@ -561,34 +478,38 @@
 
         <div class="main-content">
             <div class="top-bar">
-                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <button id="mobileMenuBtn" style="display: none; background: none; border: none; font-size: 24px; cursor: pointer;">
                     <i class="fas fa-bars"></i>
                 </button>
                 <div></div>
-                <div>
-                    <span id="currentUser"></span>
+                <div class="user-info">
+                    <span id="currentUser">Welcome, User</span>
                     <button class="logout-btn" id="logoutBtn">Logout</button>
                 </div>
             </div>
+
             <div id="pageContent">
-                <div class="loader" style="margin: 50px auto;"></div>
+                <!-- Dynamic content will be loaded here -->
             </div>
         </div>
     </div>
 
-    <!-- Lead Modal -->
+    <!-- Modals -->
     <div id="leadModal" class="modal">
         <div class="modal-content">
-            <h3 id="modalTitle">Lead Details</h3>
+            <h3 id="modalTitle">Add Lead</h3>
             <form id="leadForm">
                 <input type="hidden" id="leadId">
                 <div class="form-group">
-                    <input type="text" id="leadName" placeholder="Name *" required>
+                    <label>Name *</label>
+                    <input type="text" id="leadName" required>
                 </div>
                 <div class="form-group">
-                    <input type="tel" id="leadPhone" placeholder="Phone (10-digit) *" maxlength="10" required>
+                    <label>Phone *</label>
+                    <input type="tel" id="leadPhone" placeholder="10-digit mobile number" pattern="[0-9]{10}" maxlength="10" required>
                 </div>
                 <div class="form-group">
+                    <label>Source</label>
                     <select id="leadSource">
                         <option value="Manual">Manual</option>
                         <option value="Facebook Ads">Facebook Ads</option>
@@ -597,6 +518,7 @@
                     </select>
                 </div>
                 <div class="form-group">
+                    <label>Status</label>
                     <select id="leadStatus">
                         <option value="New">New</option>
                         <option value="Contacted">Contacted</option>
@@ -607,6 +529,7 @@
                     </select>
                 </div>
                 <div class="form-group">
+                    <label>Priority</label>
                     <select id="leadPriority">
                         <option value="Hot">Hot</option>
                         <option value="Warm">Warm</option>
@@ -614,6 +537,7 @@
                     </select>
                 </div>
                 <div class="form-group">
+                    <label>Assigned To</label>
                     <select id="leadAssignedTo">
                         <option value="Unassigned">Unassigned</option>
                         <option value="agent1">Agent 1</option>
@@ -621,476 +545,454 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <input type="date" id="leadNextFollowup" placeholder="Next Follow-up">
+                    <label>Next Follow-up Date</label>
+                    <input type="date" id="leadNextFollowup">
                 </div>
                 <div class="form-group">
-                    <textarea id="leadRemarks" rows="2" placeholder="Remarks"></textarea>
+                    <label>Remarks</label>
+                    <textarea id="leadRemarks" rows="3"></textarea>
                 </div>
-                <button type="submit" class="login-btn">Save</button>
-                <button type="button" onclick="closeModal()" style="margin-top: 10px; width: 100%; padding: 10px; background: #95a5a6; color: #fff; border: none; border-radius: 8px; cursor: pointer;">Cancel</button>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Save</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                </div>
             </form>
         </div>
     </div>
 
     <script>
+        // Configuration
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxnyMIdH5Jwwb8P68Zs8nVKmaISxHUXYqWz48CJqMNmL12DhwJ69nQjUnZct36Jtqi_/exec';
+        
+        let currentUser = null;
+        let allLeads = [];
+        
         // ============================================
-        // CONFIGURATION
-        // ============================================
-        const API_URL = 'https://script.google.com/macros/s/AKfycbzNaDuJDL9OEwQdIBWifD7Iv7ECqiPNlBX0FJoIwG8s8nfBerK4RrLXu2Jg1AFUDvos/exec'; // Replace with your deployed URL
-        const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache
-
-        // ============================================
-        // STATE MANAGEMENT
-        // ============================================
-        let state = {
-            user: null,
-            leads: [],
-            filters: { status: '', priority: '', search: '' },
-            pagination: { page: 1, limit: 20, total: 0 },
-            cache: { data: null, timestamp: 0 },
-            currentPage: 'dashboard'
-        };
-
-        // ============================================
-        // UTILITY FUNCTIONS
+        // PHONE NUMBER UTILITIES
         // ============================================
         
-        function showNotification(msg, type = 'info') {
-            const n = document.createElement('div');
-            n.className = `notification notification-${type}`;
-            n.textContent = msg;
-            document.body.appendChild(n);
-            setTimeout(() => n.remove(), 2000);
-        }
-
-        function formatPhone(p) {
-            if (!p) return null;
-            let c = p.toString().replace(/\D/g, '');
-            if (c.startsWith('91') && c.length === 12) c = c.substring(2);
-            if (c.startsWith('0')) c = c.substring(1);
-            return c.length === 10 ? c : null;
-        }
-
-        function openWhatsApp(p) {
-            let f = formatPhone(p);
-            if (f) {
-                window.open(`https://wa.me/91${f}`, '_blank');
-                showNotification(`Opening WhatsApp for ${f}`, 'success');
-            } else {
-                showNotification('Invalid phone number', 'error');
+        function formatPhoneNumber(phone) {
+            // Remove any non-digit characters
+            let cleaned = phone.toString().replace(/\D/g, '');
+            
+            // Remove leading '0' or '+91' if present
+            if (cleaned.startsWith('91') && cleaned.length === 12) {
+                cleaned = cleaned.substring(2);
             }
-        }
-
-        function makeCall(p) {
-            let f = formatPhone(p);
-            if (f) {
-                window.location.href = `tel:+91${f}`;
-                showNotification(`Calling ${f}...`, 'success');
-            } else {
-                showNotification('Invalid phone number', 'error');
+            if (cleaned.startsWith('0')) {
+                cleaned = cleaned.substring(1);
             }
-        }
-
-        function escapeHtml(t) {
-            if (!t) return '';
-            return t.replace(/[&<>]/g, function(m) {
-                return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m];
-            });
-        }
-
-        function formatDate(dateStr) {
-            if (!dateStr) return 'N/A';
-            try {
-                const d = new Date(dateStr);
-                if (isNaN(d.getTime())) return 'N/A';
-                return d.toLocaleDateString();
-            } catch (e) {
-                return 'N/A';
+            
+            // Ensure it's exactly 10 digits
+            if (cleaned.length !== 10) {
+                return null;
             }
+            
+            return cleaned;
         }
-
-        // ============================================
-        // OPTIMIZED API CALLS WITH CACHING
-        // ============================================
         
-        let pendingRequests = new Map();
-
-        async function callAPI(action, params = {}, method = 'GET') {
-            const cacheKey = `${action}_${JSON.stringify(params)}`;
-            
-            // Check cache for GET requests
-            if (method === 'GET' && state.cache.data && state.cache.timestamp > Date.now() - CACHE_DURATION) {
-                if (state.cache.data.action === action && JSON.stringify(state.cache.data.params) === JSON.stringify(params)) {
-                    return state.cache.data.result;
-                }
-            }
-            
-            // Prevent duplicate requests
-            if (pendingRequests.has(cacheKey)) {
-                return pendingRequests.get(cacheKey);
-            }
-            
-            const promise = (async () => {
-                try {
-                    let url = `${API_URL}?action=${action}`;
-                    if (method === 'GET') {
-                        const q = new URLSearchParams(params);
-                        if (q.toString()) url += '&' + q.toString();
-                    }
-                    
-                    const options = { method, headers: { 'Content-Type': 'application/json' } };
-                    if (method === 'POST') options.body = JSON.stringify(params);
-                    
-                    const response = await fetch(url);
-                    const result = await response.json();
-                    
-                    // Cache GET results
-                    if (method === 'GET' && result.success) {
-                        state.cache = {
-                            data: { action, params, result },
-                            timestamp: Date.now()
-                        };
-                    }
-                    
-                    return result;
-                } catch (e) {
-                    console.error('API Error:', e);
-                    showNotification('Network error', 'error');
-                    return { success: false, message: e.message };
-                } finally {
-                    pendingRequests.delete(cacheKey);
-                }
-            })();
-            
-            pendingRequests.set(cacheKey, promise);
-            return promise;
-        }
-
-        // ============================================
-        // DATA FETCHING FUNCTIONS
-        // ============================================
-        
-        async function fetchLeads(page = 1) {
-            const params = {
-                page: page,
-                limit: state.pagination.limit,
-                ...state.filters
-            };
-            
-            if (state.user?.role === 'agent') {
-                params.assignedTo = state.user.username;
-            }
-            
-            const result = await callAPI('getLeads', params, 'GET');
-            if (result.success) {
-                state.leads = result.data?.leads || [];
-                state.pagination.total = result.data?.total || 0;
-                state.pagination.page = page;
-                return state.leads;
-            }
-            return [];
-        }
-
-        async function fetchStats() {
-            const params = state.user?.role === 'agent' ? { assignedTo: state.user.username } : {};
-            const result = await callAPI('getStats', params, 'GET');
-            return result.success ? result.data : { total: 0, byStatus: {}, byPriority: {}, conversionRate: 0 };
-        }
-
-        async function fetchFollowups() {
-            const params = state.user?.role === 'agent' ? { assignedTo: state.user.username } : {};
-            const result = await callAPI('getFollowups', params, 'GET');
-            return result.success ? result.data : { overdue: [], today: [], upcoming: [] };
-        }
-
-        async function addLead(leadData) {
-            const formatted = formatPhone(leadData.phone);
-            if (!formatted) {
-                showNotification('Please enter valid 10-digit phone number', 'error');
+        function openWhatsApp(phone) {
+            const formattedPhone = formatPhoneNumber(phone);
+            if (!formattedPhone) {
+                showNotification('Invalid phone number! Please enter a valid 10-digit mobile number.', 'error');
                 return false;
             }
-            leadData.phone = formatted;
             
-            const result = await callAPI('addLead', {
-                lead: leadData,
-                createdBy: state.user.username
-            }, 'POST');
-            
-            if (result.success) {
-                showNotification('Lead added successfully!', 'success');
-                return true;
-            }
-            showNotification(result.message || 'Error adding lead', 'error');
-            return false;
+            // Open WhatsApp with formatted number (India: +91 + 10-digit number)
+            const whatsappUrl = `https://wa.me/91${formattedPhone}`;
+            window.open(whatsappUrl, '_blank');
+            showNotification(`Opening WhatsApp for ${formattedPhone}`, 'success');
+            return true;
         }
-
-        async function updateLead(leadData) {
-            if (leadData.phone) {
-                const formatted = formatPhone(leadData.phone);
-                if (!formatted) {
-                    showNotification('Please enter valid 10-digit phone number', 'error');
+        
+        function makePhoneCall(phone) {
+            const formattedPhone = formatPhoneNumber(phone);
+            if (!formattedPhone) {
+                showNotification('Invalid phone number! Please enter a valid 10-digit mobile number.', 'error');
+                return false;
+            }
+            
+            // For mobile devices, use tel: link
+            const telUrl = `tel:+91${formattedPhone}`;
+            
+            // Check if on mobile device
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                window.location.href = telUrl;
+                showNotification(`Calling ${formattedPhone}...`, 'success');
+            } else {
+                // On desktop, show notification with number
+                showNotification(`Call +91${formattedPhone} from your phone`, 'success');
+                // Also copy to clipboard
+                navigator.clipboard.writeText(`+91${formattedPhone}`);
+                showNotification(`Phone number copied to clipboard!`, 'success');
+            }
+            return true;
+        }
+        
+        // ============================================
+        // AUTHENTICATION
+        // ============================================
+        
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch(`${API_URL}?action=authenticate&username=${username}&password=${password}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentUser = data.data;
+                    localStorage.setItem('crmUser', JSON.stringify(currentUser));
+                    showApp();
+                    loadDashboard();
+                } else {
+                    alert('Invalid credentials');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Login failed. Please check your connection.');
+            }
+        });
+        
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('crmUser');
+            currentUser = null;
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('appContainer').style.display = 'none';
+        });
+        
+        // Check for saved session
+        const savedUser = localStorage.getItem('crmUser');
+        if (savedUser) {
+            currentUser = JSON.parse(savedUser);
+            showApp();
+            loadDashboard();
+        }
+        
+        function showApp() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+            document.getElementById('currentUser').textContent = `Welcome, ${currentUser.username}`;
+            
+            // Setup mobile menu
+            if (window.innerWidth <= 768) {
+                document.getElementById('mobileMenuBtn').style.display = 'block';
+                document.getElementById('mobileMenuBtn').onclick = () => {
+                    document.getElementById('sidebar').classList.toggle('active');
+                };
+            }
+        }
+        
+        // ============================================
+        // API FUNCTIONS
+        // ============================================
+        
+        async function fetchLeads(filters = {}) {
+            try {
+                let url = `${API_URL}?action=getLeads`;
+                if (filters.status) url += `&status=${filters.status}`;
+                if (filters.assignedTo) url += `&assignedTo=${filters.assignedTo}`;
+                if (filters.search) url += `&search=${filters.search}`;
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.success) {
+                    allLeads = data.data;
+                    return allLeads;
+                }
+                return [];
+            } catch (error) {
+                console.error('Error fetching leads:', error);
+                return [];
+            }
+        }
+        
+        async function addLead(leadData) {
+            try {
+                // Format phone number before saving
+                const formattedPhone = formatPhoneNumber(leadData.phone);
+                if (!formattedPhone) {
+                    showNotification('Please enter a valid 10-digit mobile number', 'error');
                     return false;
                 }
-                leadData.phone = formatted;
+                leadData.phone = formattedPhone;
+                
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'addLead',
+                        ...leadData,
+                        createdBy: currentUser.username
+                    })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showNotification('Lead added successfully!', 'success');
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                console.error('Error adding lead:', error);
+                showNotification('Error adding lead', 'error');
+                return false;
             }
-            
-            const result = await callAPI('updateLead', { lead: leadData }, 'POST');
-            if (result.success) {
-                showNotification('Lead updated successfully!', 'success');
-                return true;
-            }
-            showNotification(result.message || 'Error updating lead', 'error');
-            return false;
         }
-
+        
+        async function updateLead(leadData) {
+            try {
+                // Format phone number if provided
+                if (leadData.phone) {
+                    const formattedPhone = formatPhoneNumber(leadData.phone);
+                    if (formattedPhone) {
+                        leadData.phone = formattedPhone;
+                    }
+                }
+                
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'updateLead',
+                        ...leadData
+                    })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showNotification('Lead updated successfully!', 'success');
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                console.error('Error updating lead:', error);
+                showNotification('Error updating lead', 'error');
+                return false;
+            }
+        }
+        
         async function deleteLead(leadId) {
             if (!confirm('Are you sure you want to delete this lead?')) return false;
             
-            const result = await callAPI('deleteLead', { leadId }, 'POST');
-            if (result.success) {
-                showNotification('Lead deleted successfully!', 'success');
-                return true;
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'deleteLead',
+                        leadId: leadId
+                    })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showNotification('Lead deleted successfully!', 'success');
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                console.error('Error deleting lead:', error);
+                showNotification('Error deleting lead', 'error');
+                return false;
             }
-            showNotification(result.message || 'Error deleting lead', 'error');
-            return false;
         }
-
-        async function quickUpdate(leadId, updates) {
-            const result = await callAPI('quickUpdate', { leadId, updates }, 'POST');
-            if (result.success) {
-                showNotification('Updated!', 'success');
-                return true;
+        
+        async function fetchStats() {
+            try {
+                const response = await fetch(`${API_URL}?action=getStats`);
+                const data = await response.json();
+                if (data.success) {
+                    return data.data;
+                }
+                return null;
+            } catch (error) {
+                console.error('Error fetching stats:', error);
+                return null;
             }
-            return false;
         }
-
+        
+        async function fetchTodaysFollowups() {
+            try {
+                const response = await fetch(`${API_URL}?action=getTodaysFollowups`);
+                const data = await response.json();
+                if (data.success) {
+                    return data.data;
+                }
+                return [];
+            } catch (error) {
+                console.error('Error fetching followups:', error);
+                return [];
+            }
+        }
+        
         // ============================================
-        // RENDERING FUNCTIONS
+        // UI FUNCTIONS
         // ============================================
         
-        function renderTable(leads) {
-            if (!leads || leads.length === 0) {
-                return '<p style="text-align: center; padding: 40px;">No leads found</p>';
-            }
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type}`;
+            notification.textContent = message;
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.zIndex = '9999';
+            document.body.appendChild(notification);
             
-            let html = `<table><thead>汽<th>Name</th><th>Phone</th><th>Status</th><th>Priority</th><th>Next Follow-up</th><th>Actions</th></tr></thead><tbody>`;
-            
-            leads.forEach(l => {
-                const priorityClass = `priority-${(l.Priority || 'cold').toLowerCase()}`;
-                const statusClass = `status-${(l.Status || 'new').toLowerCase().replace(' ', '-')}`;
-                const followup = formatDate(l['Next Follow-up Date']);
-                const isOverdue = l['Next Follow-up Date'] && new Date(l['Next Follow-up Date']) < new Date();
-                
-                html += `<tr>
-                    <td><strong>${escapeHtml(l.Name || '')}</strong></td>
-                    <td>${escapeHtml(l.Phone || '')}</td>
-                    <td><span class="status-badge ${statusClass}">${l.Status || 'New'}</span></td>
-                    <td class="${priorityClass}">${l.Priority || 'Cold'}</td>
-                    <td ${isOverdue ? 'style="color:red;font-weight:bold"' : ''}>${followup}</td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn-icon btn-call" onclick="makeCall('${l.Phone}')" title="Call"><i class="fas fa-phone"></i></button>
-                            <button class="btn-icon btn-whatsapp" onclick="openWhatsApp('${l.Phone}')" title="WhatsApp"><i class="fab fa-whatsapp"></i></button>
-                            <button class="btn-icon btn-edit" onclick="editLead('${l['Lead ID']}')" title="Edit"><i class="fas fa-edit"></i></button>
-                            ${state.user?.role === 'admin' ? `<button class="btn-icon btn-delete" onclick="deleteLeadHandler('${l['Lead ID']}')" title="Delete"><i class="fas fa-trash"></i></button>` : ''}
-                        </div>
-                        <div class="quick-actions">
-                            <button class="quick-btn quick-btn-interested" onclick="quickUpdateStatus('${l['Lead ID']}', 'Interested')">👍 Interested</button>
-                            <button class="quick-btn quick-btn-not-interested" onclick="quickUpdateStatus('${l['Lead ID']}', 'Not Interested')">👎 Not Interested</button>
-                            <button class="quick-btn quick-btn-callback" onclick="quickUpdateStatus('${l['Lead ID']}', 'Callback Later')">⏰ Callback</button>
-                        </div>
-                    </td>
-                </tr>`;
-            });
-            
-            html += '</tbody></table>';
-            return html;
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
         }
-
-        function renderCards(leads) {
-            if (!leads || leads.length === 0) return '';
-            
-            let html = '<div class="lead-cards">';
-            leads.forEach(l => {
-                const priorityClass = `priority-${(l.Priority || 'cold').toLowerCase()}`;
-                const statusClass = `status-${(l.Status || 'new').toLowerCase().replace(' ', '-')}`;
-                
-                html += `<div class="lead-card">
-                    <div class="lead-card-header">
-                        <span class="lead-card-name">${escapeHtml(l.Name || '')}</span>
-                        <span class="${priorityClass}">${l.Priority || 'Cold'}</span>
-                    </div>
-                    <div class="lead-card-phone">📞 ${escapeHtml(l.Phone || '')}</div>
-                    <div class="lead-card-badges">
-                        <span class="status-badge ${statusClass}">${l.Status || 'New'}</span>
-                        <span>👤 ${escapeHtml(l['Assigned To'] || 'Unassigned')}</span>
-                    </div>
-                    <div class="action-buttons">
-                        <button class="btn-icon btn-call" onclick="makeCall('${l.Phone}')"><i class="fas fa-phone"></i></button>
-                        <button class="btn-icon btn-whatsapp" onclick="openWhatsApp('${l.Phone}')"><i class="fab fa-whatsapp"></i></button>
-                        <button class="btn-icon btn-edit" onclick="editLead('${l['Lead ID']}')"><i class="fas fa-edit"></i></button>
-                    </div>
-                    <div class="quick-actions">
-                        <button class="quick-btn quick-btn-interested" onclick="quickUpdateStatus('${l['Lead ID']}', 'Interested')">Interested</button>
-                        <button class="quick-btn quick-btn-not-interested" onclick="quickUpdateStatus('${l['Lead ID']}', 'Not Interested')">Not Interested</button>
-                        <button class="quick-btn quick-btn-callback" onclick="quickUpdateStatus('${l['Lead ID']}', 'Callback Later')">Callback</button>
-                    </div>
-                </div>`;
-            });
-            html += '</div>';
-            return html;
-        }
-
-        function renderPagination() {
-            const totalPages = Math.ceil(state.pagination.total / state.pagination.limit);
-            if (totalPages <= 1) return '';
-            
-            return `<div class="pagination">
-                <button onclick="changePage(${state.pagination.page - 1})" ${state.pagination.page === 1 ? 'disabled' : ''}>
-                    <i class="fas fa-chevron-left"></i> Previous
-                </button>
-                <span>Page ${state.pagination.page} of ${totalPages}</span>
-                <button onclick="changePage(${state.pagination.page + 1})" ${state.pagination.page === totalPages ? 'disabled' : ''}>
-                    Next <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>`;
-        }
-
-        // ============================================
-        // PAGE LOADERS
-        // ============================================
         
         async function loadDashboard() {
-            if (state.currentPage === 'dashboard') return;
-            state.currentPage = 'dashboard';
-            document.getElementById('pageContent').innerHTML = '<div class="loader" style="margin: 50px auto;"></div>';
+            const stats = await fetchStats();
+            const followups = await fetchTodaysFollowups();
             
-            const [stats, followups] = await Promise.all([fetchStats(), fetchFollowups()]);
-            await fetchLeads(1);
-            
-            const html = `
+            let html = `
                 <h2>Dashboard</h2>
                 <div class="stats-grid">
-                    <div class="stat-card" onclick="loadLeadsPage()">
+                    <div class="stat-card">
                         <h4>Total Leads</h4>
-                        <div class="number">${stats.total || 0}</div>
+                        <div class="number">${stats?.total || 0}</div>
                     </div>
-                    <div class="stat-card" onclick="loadLeadsPage({status:'Interested'})">
+                    <div class="stat-card">
                         <h4>Conversion Rate</h4>
-                        <div class="number">${stats.conversionRate || 0}%</div>
+                        <div class="number">${stats?.conversionRate || 0}%</div>
                     </div>
-                    <div class="stat-card" onclick="loadFollowupsPage('today')">
+                    <div class="stat-card">
                         <h4>Today's Follow-ups</h4>
-                        <div class="number">${followups.today?.length || 0}</div>
+                        <div class="number">${followups.length}</div>
                     </div>
-                    <div class="stat-card" onclick="loadLeadsPage({priority:'Hot'})">
+                    <div class="stat-card">
                         <h4>Hot Leads</h4>
-                        <div class="number">${stats.byPriority?.Hot || 0}</div>
+                        <div class="number">${stats?.byPriority?.Hot || 0}</div>
                     </div>
                 </div>
+                
                 <div class="lead-table-container">
                     <h3>Recent Leads</h3>
-                    ${renderTable(state.leads.slice(0, 10))}
+                    ${renderLeadTable(allLeads.slice(0, 10))}
                 </div>
-                ${renderCards(state.leads.slice(0, 10))}
             `;
+            
             document.getElementById('pageContent').innerHTML = html;
         }
-
+        
         async function loadLeadsPage(filters = {}, isMyLeads = false) {
-            if (state.currentPage === 'leads' && !Object.keys(filters).length && !isMyLeads) return;
-            state.currentPage = 'leads';
-            document.getElementById('pageContent').innerHTML = '<div class="loader" style="margin: 50px auto;"></div>';
+            let leads = await fetchLeads(filters);
             
-            Object.assign(state.filters, filters);
-            
-            if (isMyLeads && state.user?.role !== 'admin') {
-                state.filters.assignedTo = state.user.username;
-            } else if (!isMyLeads && state.filters.assignedTo === state.user?.username) {
-                delete state.filters.assignedTo;
+            if (isMyLeads && currentUser.role !== 'admin') {
+                leads = leads.filter(lead => lead['Assigned To'] === currentUser.username);
             }
             
-            await fetchLeads(1);
-            
-            const html = `
+            let html = `
                 <h2>${isMyLeads ? 'My Leads' : 'All Leads'}</h2>
                 <div class="filters-bar">
-                    <select id="statusFilter" onchange="applyFilters(${isMyLeads})">
+                    <select id="statusFilter">
                         <option value="">All Status</option>
-                        <option ${state.filters.status === 'New' ? 'selected' : ''}>New</option>
-                        <option ${state.filters.status === 'Contacted' ? 'selected' : ''}>Contacted</option>
-                        <option ${state.filters.status === 'Interested' ? 'selected' : ''}>Interested</option>
-                        <option ${state.filters.status === 'Not Interested' ? 'selected' : ''}>Not Interested</option>
-                        <option ${state.filters.status === 'Callback Later' ? 'selected' : ''}>Callback Later</option>
-                        <option ${state.filters.status === 'Closed' ? 'selected' : ''}>Closed</option>
+                        <option value="New">New</option>
+                        <option value="Contacted">Contacted</option>
+                        <option value="Interested">Interested</option>
+                        <option value="Not Interested">Not Interested</option>
+                        <option value="Callback Later">Callback Later</option>
+                        <option value="Closed">Closed</option>
                     </select>
-                    <select id="priorityFilter" onchange="applyFilters(${isMyLeads})">
-                        <option value="">All Priority</option>
-                        <option ${state.filters.priority === 'Hot' ? 'selected' : ''}>Hot</option>
-                        <option ${state.filters.priority === 'Warm' ? 'selected' : ''}>Warm</option>
-                        <option ${state.filters.priority === 'Cold' ? 'selected' : ''}>Cold</option>
-                    </select>
-                    <input type="text" id="searchFilter" placeholder="Search by name or phone..." value="${state.filters.search || ''}" onkeyup="debounceFilters(${isMyLeads})">
-                    <button onclick="applyFilters(${isMyLeads})" class="login-btn" style="width: auto; padding: 8px 15px;">Apply</button>
-                    <button onclick="clearFilters(${isMyLeads})" class="login-btn" style="width: auto; padding: 8px 15px; background: #95a5a6;">Clear</button>
+                    <input type="text" id="searchFilter" placeholder="Search by name or phone...">
+                    <button onclick="applyFilters(${isMyLeads})" class="btn-primary">Apply Filters</button>
                 </div>
                 <div class="lead-table-container">
-                    ${renderTable(state.leads)}
-                    ${renderPagination()}
+                    ${renderLeadTable(leads, isMyLeads)}
                 </div>
-                ${renderCards(state.leads)}
             `;
+            
             document.getElementById('pageContent').innerHTML = html;
         }
-
-        async function loadFollowupsPage(category = 'all') {
-            state.currentPage = 'followups';
-            document.getElementById('pageContent').innerHTML = '<div class="loader" style="margin: 50px auto;"></div>';
+        
+        function renderLeadTable(leads, isMyLeads = false) {
+            if (!leads || leads.length === 0) {
+                return '<p>No leads found.</p>';
+            }
             
-            const data = await fetchFollowups();
-            let leads = [];
-            
-            if (category === 'overdue') leads = data.overdue || [];
-            else if (category === 'today') leads = data.today || [];
-            else if (category === 'upcoming') leads = data.upcoming || [];
-            else leads = [...(data.overdue || []), ...(data.today || []), ...(data.upcoming || [])];
-            
-            const html = `
-                <h2>Follow-ups Management</h2>
-                <div class="filters-bar">
-                    <button class="login-btn" style="width: auto; padding: 8px 15px;" onclick="loadFollowupsPage('overdue')">
-                        ⚠️ Overdue (${data.overdue?.length || 0})
-                    </button>
-                    <button class="login-btn" style="width: auto; padding: 8px 15px;" onclick="loadFollowupsPage('today')">
-                        📅 Today (${data.today?.length || 0})
-                    </button>
-                    <button class="login-btn" style="width: auto; padding: 8px 15px;" onclick="loadFollowupsPage('upcoming')">
-                        📆 Upcoming (${data.upcoming?.length || 0})
-                    </button>
-                </div>
-                <div class="lead-table-container">
-                    <h3>${category === 'overdue' ? '⚠️ Overdue Follow-ups' : category === 'today' ? '📅 Today\'s Follow-ups' : '📆 Upcoming Follow-ups'}</h3>
-                    ${renderTable(leads)}
-                </div>
-                ${renderCards(leads)}
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                            <th>Assigned To</th>
+                            <th>Next Follow-up</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
             `;
-            document.getElementById('pageContent').innerHTML = html;
+            
+            leads.forEach(lead => {
+                const priorityClass = `priority-${lead.Priority?.toLowerCase() || 'cold'}`;
+                const statusClass = `status-${lead.Status?.toLowerCase().replace(' ', '-') || 'new'}`;
+                const followupDate = lead['Next Follow-up Date'] ? new Date(lead['Next Follow-up Date']).toLocaleDateString() : 'N/A';
+                const isOverdue = lead['Next Follow-up Date'] && new Date(lead['Next Follow-up Date']) < new Date();
+                const formattedPhone = formatPhoneNumber(lead.Phone) || lead.Phone;
+                
+                html += `
+                    <tr>
+                        <td>${escapeHtml(lead.Name || '')}</td>
+                        <td class="phone-number">${escapeHtml(formattedPhone || '')}</td>
+                        <td><span class="status-badge ${statusClass}">${lead.Status || 'New'}</span></td>
+                        <td class="${priorityClass}">${lead.Priority || 'Cold'}</td>
+                        <td>${escapeHtml(lead['Assigned To'] || 'Unassigned')}</td>
+                        <td ${isOverdue ? 'style="color: red; font-weight: bold;"' : ''}>${followupDate}</td>
+                        <td class="action-buttons">
+                            <button class="btn-icon btn-edit" onclick="editLead('${lead['Lead ID']}')" title="Edit Lead">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-icon btn-call" onclick="makePhoneCall('${lead.Phone}')" title="Make Phone Call">
+                                <i class="fas fa-phone"></i>
+                            </button>
+                            <button class="btn-icon btn-whatsapp" onclick="openWhatsApp('${lead.Phone}')" title="Open WhatsApp">
+                                <i class="fab fa-whatsapp"></i>
+                            </button>
+                            <button class="btn-icon btn-delete" onclick="deleteLeadHandler('${lead['Lead ID']}')" title="Delete Lead">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                    </tbody>
+                </table>
+            `;
+            
+            return html;
         }
-
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
         async function loadAddLeadPage() {
-            state.currentPage = 'addLead';
-            document.getElementById('pageContent').innerHTML = `
+            let html = `
                 <h2>Add New Lead</h2>
-                <div style="background: #fff; padding: 25px; border-radius: 15px; max-width: 500px; margin: 0 auto;">
+                <div style="background: white; padding: 30px; border-radius: 15px; max-width: 600px;">
                     <form id="newLeadForm">
                         <div class="form-group">
-                            <input type="text" id="newName" placeholder="Name *" required>
+                            <label>Name *</label>
+                            <input type="text" id="newLeadName" required>
                         </div>
                         <div class="form-group">
-                            <input type="tel" id="newPhone" placeholder="Phone (10-digit) *" maxlength="10" required>
+                            <label>Phone * (10-digit mobile number)</label>
+                            <input type="tel" id="newLeadPhone" placeholder="9876543210" pattern="[0-9]{10}" maxlength="10" required>
+                            <small style="color: #666;">Enter 10-digit mobile number without country code</small>
                         </div>
                         <div class="form-group">
-                            <select id="newSource">
+                            <label>Source</label>
+                            <select id="newLeadSource">
                                 <option value="Manual">Manual</option>
                                 <option value="Facebook Ads">Facebook Ads</option>
                                 <option value="Google Ads">Google Ads</option>
@@ -1098,182 +1000,140 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <select id="newPriority">
+                            <label>Priority</label>
+                            <select id="newLeadPriority">
                                 <option value="Hot">Hot</option>
                                 <option value="Warm">Warm</option>
                                 <option value="Cold">Cold</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <select id="newAssigned">
+                            <label>Assigned To</label>
+                            <select id="newLeadAssignedTo">
                                 <option value="Unassigned">Unassigned</option>
                                 <option value="agent1">Agent 1</option>
                                 <option value="agent2">Agent 2</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <input type="date" id="newFollowup" placeholder="Next Follow-up Date">
+                            <label>Next Follow-up Date</label>
+                            <input type="date" id="newLeadNextFollowup">
                         </div>
                         <div class="form-group">
-                            <textarea id="newRemarks" rows="2" placeholder="Remarks"></textarea>
+                            <label>Remarks</label>
+                            <textarea id="newLeadRemarks" rows="3"></textarea>
                         </div>
-                        <button type="submit" class="login-btn">Add Lead</button>
+                        <button type="submit" class="btn-primary">Add Lead</button>
                     </form>
                 </div>
             `;
             
-            document.getElementById('newLeadForm').onsubmit = async (e) => {
+            document.getElementById('pageContent').innerHTML = html;
+            
+            document.getElementById('newLeadForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const phone = document.getElementById('newPhone').value;
-                const formatted = formatPhone(phone);
+                const phone = document.getElementById('newLeadPhone').value;
+                const formattedPhone = formatPhoneNumber(phone);
                 
-                if (!formatted) {
+                if (!formattedPhone) {
                     showNotification('Please enter a valid 10-digit mobile number', 'error');
                     return;
                 }
                 
-                const lead = {
-                    name: document.getElementById('newName').value,
-                    phone: formatted,
-                    source: document.getElementById('newSource').value,
-                    priority: document.getElementById('newPriority').value,
-                    assignedTo: document.getElementById('newAssigned').value,
-                    nextFollowupDate: document.getElementById('newFollowup').value,
-                    remarks: document.getElementById('newRemarks').value,
+                const leadData = {
+                    name: document.getElementById('newLeadName').value,
+                    phone: formattedPhone,
+                    source: document.getElementById('newLeadSource').value,
+                    priority: document.getElementById('newLeadPriority').value,
+                    assignedTo: document.getElementById('newLeadAssignedTo').value,
+                    nextFollowupDate: document.getElementById('newLeadNextFollowup').value,
+                    remarks: document.getElementById('newLeadRemarks').value,
                     status: 'New'
                 };
                 
-                const success = await addLead(lead);
+                const success = await addLead(leadData);
                 if (success) {
-                    if (lead.priority === 'Hot') {
-                        setTimeout(() => openWhatsApp(formatted), 500);
+                    // Auto-open WhatsApp if hot lead
+                    if (leadData.priority === 'Hot') {
+                        setTimeout(() => {
+                            openWhatsApp(formattedPhone);
+                        }, 500);
                     }
                     loadLeadsPage({}, false);
                 }
-            };
+            });
         }
-
-        // ============================================
-        // FILTER FUNCTIONS
-        // ============================================
         
-        let filterTimer;
-        window.debounceFilters = (isMyLeads) => {
-            clearTimeout(filterTimer);
-            filterTimer = setTimeout(() => applyFilters(isMyLeads), 500);
+        async function loadFollowupsPage() {
+            const followups = await fetchTodaysFollowups();
+            
+            let html = `
+                <h2>Today's Follow-ups</h2>
+                <div class="lead-table-container">
+                    ${renderLeadTable(followups, false)}
+                </div>
+            `;
+            
+            document.getElementById('pageContent').innerHTML = html;
+        }
+        
+        // Global functions for buttons
+        window.editLead = async (leadId) => {
+            const lead = allLeads.find(l => l['Lead ID'] === leadId);
+            if (lead) {
+                document.getElementById('modalTitle').textContent = 'Edit Lead';
+                document.getElementById('leadId').value = lead['Lead ID'];
+                document.getElementById('leadName').value = lead.Name || '';
+                document.getElementById('leadPhone').value = lead.Phone || '';
+                document.getElementById('leadSource').value = lead.Source || 'Manual';
+                document.getElementById('leadStatus').value = lead.Status || 'New';
+                document.getElementById('leadPriority').value = lead.Priority || 'Warm';
+                document.getElementById('leadAssignedTo').value = lead['Assigned To'] || 'Unassigned';
+                document.getElementById('leadNextFollowup').value = lead['Next Follow-up Date'] ? lead['Next Follow-up Date'].split('T')[0] : '';
+                document.getElementById('leadRemarks').value = lead.Remarks || '';
+                document.getElementById('leadModal').style.display = 'flex';
+            }
         };
-
+        
+        // Make functions globally available
+        window.openWhatsApp = openWhatsApp;
+        window.makePhoneCall = makePhoneCall;
+        window.formatPhoneNumber = formatPhoneNumber;
+        
+        window.deleteLeadHandler = async (leadId) => {
+            const success = await deleteLead(leadId);
+            if (success) {
+                loadLeadsPage({}, false);
+            }
+        };
+        
         window.applyFilters = async (isMyLeads) => {
-            state.filters.status = document.getElementById('statusFilter')?.value || '';
-            state.filters.priority = document.getElementById('priorityFilter')?.value || '';
-            state.filters.search = document.getElementById('searchFilter')?.value || '';
-            await fetchLeads(1);
-            
-            const container = document.querySelector('.lead-table-container');
-            if (container) {
-                container.innerHTML = renderTable(state.leads) + renderPagination();
-            }
+            const status = document.getElementById('statusFilter').value;
+            const search = document.getElementById('searchFilter').value;
+            loadLeadsPage({ status, search }, isMyLeads);
         };
-
-        window.clearFilters = async (isMyLeads) => {
-            state.filters = { status: '', priority: '', search: '' };
-            await fetchLeads(1);
-            loadLeadsPage({}, isMyLeads);
-        };
-
-        window.changePage = async (page) => {
-            if (page < 1) return;
-            const totalPages = Math.ceil(state.pagination.total / state.pagination.limit);
-            if (page > totalPages) return;
-            
-            await fetchLeads(page);
-            const container = document.querySelector('.lead-table-container');
-            if (container) {
-                container.innerHTML = renderTable(state.leads) + renderPagination();
-            }
-        };
-
-        // ============================================
-        // ACTION FUNCTIONS
-        // ============================================
         
-        window.editLead = async (id) => {
-            const lead = state.leads.find(l => l['Lead ID'] === id);
-            if (!lead) return;
-            
-            document.getElementById('leadId').value = id;
-            document.getElementById('leadName').value = lead.Name || '';
-            document.getElementById('leadPhone').value = lead.Phone || '';
-            document.getElementById('leadSource').value = lead.Source || 'Manual';
-            document.getElementById('leadStatus').value = lead.Status || 'New';
-            document.getElementById('leadPriority').value = lead.Priority || 'Warm';
-            document.getElementById('leadAssignedTo').value = lead['Assigned To'] || 'Unassigned';
-            document.getElementById('leadNextFollowup').value = lead['Next Follow-up Date']?.split('T')[0] || '';
-            document.getElementById('leadRemarks').value = lead.Remarks || '';
-            document.getElementById('modalTitle').textContent = 'Edit Lead';
-            document.getElementById('leadModal').style.display = 'flex';
-        };
-
-        window.quickUpdateStatus = async (id, status) => {
-            const updates = {
-                status: status,
-                lastCallDate: new Date().toISOString()
-            };
-            if (status === 'Callback Later') {
-                updates.nextFollowupDate = new Date(Date.now() + 2 * 86400000).toISOString().split('T')[0];
-            }
-            
-            const success = await quickUpdate(id, updates);
-            if (success) {
-                if (state.currentPage === 'leads') {
-                    await fetchLeads(state.pagination.page);
-                    const container = document.querySelector('.lead-table-container');
-                    if (container) {
-                        container.innerHTML = renderTable(state.leads) + renderPagination();
-                    }
-                } else if (state.currentPage === 'dashboard') {
-                    await loadDashboard();
-                } else if (state.currentPage === 'followups') {
-                    await loadFollowupsPage();
-                }
-            }
-        };
-
-        window.deleteLeadHandler = async (id) => {
-            const success = await deleteLead(id);
-            if (success) {
-                if (state.currentPage === 'leads') {
-                    await fetchLeads(state.pagination.page);
-                    const container = document.querySelector('.lead-table-container');
-                    if (container) {
-                        container.innerHTML = renderTable(state.leads) + renderPagination();
-                    }
-                } else if (state.currentPage === 'dashboard') {
-                    await loadDashboard();
-                }
-            }
-        };
-
         function closeModal() {
             document.getElementById('leadModal').style.display = 'none';
             document.getElementById('leadForm').reset();
         }
-
-        document.getElementById('leadForm').onsubmit = async (e) => {
+        
+        // Handle lead form submission
+        document.getElementById('leadForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const id = document.getElementById('leadId').value;
+            const leadId = document.getElementById('leadId').value;
             const phone = document.getElementById('leadPhone').value;
-            const formatted = formatPhone(phone);
+            const formattedPhone = formatPhoneNumber(phone);
             
-            if (!formatted) {
+            if (!formattedPhone) {
                 showNotification('Please enter a valid 10-digit mobile number', 'error');
                 return;
             }
             
-            const lead = {
-                leadId: id,
+            const leadData = {
+                leadId: leadId,
                 name: document.getElementById('leadName').value,
-                phone: formatted,
+                phone: formattedPhone,
                 source: document.getElementById('leadSource').value,
                 status: document.getElementById('leadStatus').value,
                 priority: document.getElementById('leadPriority').value,
@@ -1283,106 +1143,53 @@
                 lastCallDate: new Date().toISOString()
             };
             
-            const success = id ? await updateLead(lead) : await addLead(lead);
+            let success;
+            if (leadId) {
+                success = await updateLead(leadData);
+            } else {
+                success = await addLead(leadData);
+            }
+            
             if (success) {
                 closeModal();
-                if (state.currentPage === 'leads') {
-                    await fetchLeads(state.pagination.page);
-                    const container = document.querySelector('.lead-table-container');
-                    if (container) {
-                        container.innerHTML = renderTable(state.leads) + renderPagination();
-                    }
-                } else {
-                    await loadDashboard();
-                }
+                loadLeadsPage({}, false);
             }
-        };
-
-        // ============================================
-        // AUTHENTICATION
-        // ============================================
+        });
         
-        document.getElementById('loginForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const btn = e.target.querySelector('.login-btn');
-            const originalText = btn.textContent;
-            btn.textContent = '...';
-            btn.disabled = true;
-            
-            const result = await callAPI('authenticate', {
-                username: document.getElementById('username').value,
-                password: document.getElementById('password').value
-            }, 'GET');
-            
-            if (result.success) {
-                state.user = result.data;
-                localStorage.setItem('user', JSON.stringify(state.user));
-                document.getElementById('loginPage').style.display = 'none';
-                document.getElementById('appContainer').style.display = 'block';
-                document.getElementById('currentUser').innerHTML = `👤 ${state.user.username} <span style="font-size: 12px; background: #e0e0e0; padding: 2px 8px; border-radius: 10px; margin-left: 8px;">${state.user.role === 'admin' ? 'Admin' : 'Agent'}</span>`;
-                loadDashboard();
-                showNotification('Login successful!', 'success');
-            } else {
-                showNotification(result.message || 'Invalid credentials', 'error');
-            }
-            
-            btn.textContent = originalText;
-            btn.disabled = false;
-        };
-
-        document.getElementById('logoutBtn').onclick = () => {
-            localStorage.removeItem('user');
-            state.user = null;
-            document.getElementById('loginPage').style.display = 'flex';
-            document.getElementById('appContainer').style.display = 'none';
-            showNotification('Logged out successfully', 'info');
-        };
-
-        // ============================================
-        // MOBILE MENU
-        // ============================================
-        
-        document.getElementById('mobileMenuBtn').onclick = () => {
-            document.getElementById('sidebar').classList.toggle('active');
-        };
-
-        // ============================================
-        // MENU NAVIGATION
-        // ============================================
-        
+        // Menu navigation
         document.querySelectorAll('.menu-item').forEach(item => {
-            item.onclick = () => {
+            item.addEventListener('click', async () => {
                 document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
                 item.classList.add('active');
                 
                 const page = item.dataset.page;
-                if (page === 'dashboard') loadDashboard();
-                else if (page === 'leads') loadLeadsPage({}, false);
-                else if (page === 'myLeads') loadLeadsPage({}, true);
-                else if (page === 'addLead') loadAddLeadPage();
-                else if (page === 'followups') loadFollowupsPage();
+                switch(page) {
+                    case 'dashboard':
+                        await loadDashboard();
+                        break;
+                    case 'leads':
+                        await loadLeadsPage({}, false);
+                        break;
+                    case 'myLeads':
+                        await loadLeadsPage({}, true);
+                        break;
+                    case 'addLead':
+                        await loadAddLeadPage();
+                        break;
+                    case 'followups':
+                        await loadFollowupsPage();
+                        break;
+                }
                 
                 if (window.innerWidth <= 768) {
                     document.getElementById('sidebar').classList.remove('active');
                 }
-            };
+            });
         });
-
-        // ============================================
-        // CHECK SAVED SESSION
-        // ============================================
         
-        const saved = localStorage.getItem('user');
-        if (saved) {
-            try {
-                state.user = JSON.parse(saved);
-                document.getElementById('loginPage').style.display = 'none';
-                document.getElementById('appContainer').style.display = 'block';
-                document.getElementById('currentUser').innerHTML = `👤 ${state.user.username} <span style="font-size: 12px; background: #e0e0e0; padding: 2px 8px; border-radius: 10px; margin-left: 8px;">${state.user.role === 'admin' ? 'Admin' : 'Agent'}</span>`;
-                loadDashboard();
-            } catch (e) {
-                localStorage.removeItem('user');
-            }
+        // Initial load
+        if (currentUser) {
+            loadDashboard();
         }
     </script>
 </body>
