@@ -335,6 +335,25 @@
             font-weight: 800;
         }
 
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .mobile-logout-btn {
+            display: none;
+            width: 42px;
+            height: 42px;
+            border: 0;
+            border-radius: 8px;
+            color: #fff;
+            background: var(--danger);
+            place-items: center;
+            cursor: pointer;
+        }
+
         .grid {
             display: grid;
             gap: 14px;
@@ -667,6 +686,10 @@
                 text-overflow: ellipsis;
             }
 
+            .mobile-logout-btn {
+                display: grid;
+            }
+
             .stats-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
                 gap: 10px;
@@ -840,7 +863,12 @@
                     <h2 id="pageTitle">Dashboard</h2>
                     <p class="subtle" id="pageSubtitle">Live calling overview</p>
                 </div>
-                <div class="user-chip" id="userChip"></div>
+                <div class="top-actions">
+                    <div class="user-chip" id="userChip"></div>
+                    <button class="mobile-logout-btn" id="mobileLogoutBtn" type="button" aria-label="Logout" title="Logout">
+                        <span data-icon-slot="log-out"></span>
+                    </button>
+                </div>
             </header>
             <div id="pageContent" class="grid"></div>
         </main>
@@ -1093,10 +1121,30 @@
             });
         }
 
+        function isAdmin() {
+            return state.currentUser?.role === 'admin';
+        }
+
+        function getNavItems() {
+            if (isAdmin()) return NAV_ITEMS;
+            return NAV_ITEMS.filter((item) => item.page !== 'leads');
+        }
+
+        function getDefaultPage() {
+            return isAdmin() ? 'dashboard' : 'myLeads';
+        }
+
+        function canAccessPage(page) {
+            return getNavItems().some((item) => item.page === page);
+        }
+
         function showApp() {
             qs('#loginScreen').classList.add('hidden');
             qs('#appShell').classList.add('is-ready');
             qs('#userChip').textContent = `${state.currentUser.name || state.currentUser.username} - ${state.currentUser.role}`;
+            if (!canAccessPage(state.page) || !isAdmin()) {
+                state.page = getDefaultPage();
+            }
             renderNav();
             routeTo(state.page);
         }
@@ -1111,7 +1159,7 @@
             const tabs = qs('[data-tabs]');
             side.replaceChildren();
             tabs.replaceChildren();
-            NAV_ITEMS.forEach((item) => {
+            getNavItems().forEach((item) => {
                 const sideBtn = document.createElement('button');
                 sideBtn.className = `nav-btn ${item.page === state.page ? 'is-active' : ''}`;
                 sideBtn.type = 'button';
@@ -1129,7 +1177,8 @@
         }
 
         function routeTo(page) {
-            const item = NAV_ITEMS.find((entry) => entry.page === page) || NAV_ITEMS[0];
+            const allowedItems = getNavItems();
+            const item = allowedItems.find((entry) => entry.page === page) || allowedItems.find((entry) => entry.page === getDefaultPage()) || allowedItems[0];
             state.page = item.page;
             qs('#pageTitle').textContent = item.title;
             qs('#pageSubtitle').textContent = item.subtitle;
@@ -1348,7 +1397,7 @@
                 showToast(leadId ? 'Lead updated.' : 'Lead added.');
                 await refreshData(false);
                 closeModal();
-                routeTo('leads');
+                routeTo(isAdmin() ? 'leads' : 'myLeads');
             } catch (error) {
                 showToast(error.message, 'error');
             } finally {
@@ -1477,6 +1526,7 @@
             if (event.target.id === 'leadModal') closeModal();
         });
         qs('#logoutBtn').addEventListener('click', () => logout(true));
+        qs('#mobileLogoutBtn').addEventListener('click', () => logout(true));
         qs('#refreshBtn').addEventListener('click', () => refreshData(true).catch((error) => showToast(error.message, 'error')));
 
         readConfig();
