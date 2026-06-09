@@ -1,121 +1,103 @@
-# 🚀 Jajabor AI CRM - Telesales Management System
+# Jajabor AI CRM
 
-<div align="center">
+Production-shaped telesales CRM for Google Sheets and Google Apps Script. The app is a fast static frontend with a mobile app-style shell, backed by a versioned Apps Script API with token authentication and role-aware lead access.
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
-![Google Sheets](https://img.shields.io/badge/backend-Google%20Sheets-yellow.svg)
-![JavaScript](https://img.shields.io/badge/frontend-JavaScript-orange.svg)
-![Status](https://img.shields.io/badge/status-production%20ready-brightgreen.svg)
+## What Changed
 
-**A complete, production-ready CRM system for telesales teams using Google Sheets as a free backend database**
+- No live API URL is hard-coded in the frontend.
+- Login uses POST instead of username/password query strings.
+- API requests include a signed short-lived token.
+- Agents only receive leads assigned to them; admins can see all leads.
+- Delete is admin-only.
+- Lead rendering uses DOM nodes, not unsafe row HTML strings.
+- Mobile UI uses a fixed bottom tab bar, sticky top bar, card lists, and touch-sized controls.
+- The Apps Script backend is included under `apps-script/`.
 
-[Features](#✨-features) • [Quick Start](#⚡-quick-start) • [Installation](#📖-installation-guide) • [Demo](#🎥-demo) • [API Docs](#🔌-api-documentation)
+## Files
 
-</div>
+```text
+index.html                Static production frontend
+apps-script/Code.gs       Google Apps Script backend
+apps-script/appsscript.json
+vercel.json               Security headers for Vercel hosting
+_headers                  Security headers for Netlify-style hosting
+robots.txt                Prevents crawler indexing of the CRM login
+README.md
+```
 
----
+## Deploy Backend
 
-## 📋 Table of Contents
+1. Create or open a Google Sheet.
+2. Open Extensions > Apps Script.
+3. Copy `apps-script/Code.gs` into the Apps Script editor.
+4. Copy `apps-script/appsscript.json` into the manifest file.
+5. Run `setupJajaborCrm()` once from the Apps Script editor.
+6. Read the generated admin password from Apps Script logs.
+7. Deploy > New deployment > Web app.
+8. Set "Execute as" to yourself.
+9. Set access to "Anyone".
+10. Copy the `/exec` web app URL.
 
-- [Overview](#🎯-overview)
-- [Features](#✨-features)
-- [Tech Stack](#🛠-tech-stack)
-- [Quick Start](#⚡-quick-start)
-- [Installation Guide](#📖-installation-guide)
-- [Project Structure](#📁-project-structure)
-- [API Documentation](#🔌-api-documentation)
-- [Google Sheets Structure](#📊-google-sheets-structure)
-- [Automation & Triggers](#🤖-automation--triggers)
-- [User Roles & Permissions](#👥-user-roles--permissions)
-- [Customization Guide](#🎨-customization-guide)
-- [Deployment Options](#🚀-deployment-options)
-- [Security Best Practices](#🔒-security-best-practices)
-- [Troubleshooting](#🔧-troubleshooting)
-- [Performance Optimization](#⚡-performance-optimization)
-- [Roadmap](#🗺-roadmap)
-- [Contributing](#🤝-contributing)
-- [License](#📄-license)
+If the script is not bound to the Google Sheet, set Script Properties:
 
----
+```text
+SHEET_ID=<your spreadsheet id>
+SESSION_SECRET=<long random secret>
+```
 
-## 🎯 Overview
+`SESSION_SECRET` is created automatically by setup if missing, but set your own for controlled rotation.
 
-**Jajabor AI CRM** is a lightweight yet powerful lead management system specifically designed for telesales teams. It leverages Google Sheets as a free, scalable backend while providing a professional, responsive frontend interface.
+## Configure Frontend
 
-### Why Choose Jajabor AI CRM?
+Paste the new Apps Script `/exec` URL into `index.html`:
 
-| Feature | Benefit |
-|---------|---------|
-| 💰 **Zero Cost** | No paid subscriptions - runs entirely on free Google services |
-| ⚡ **Quick Setup** | Deploy in under 30 minutes with no coding experience required |
-| 📱 **Mobile Ready** | Fully responsive design works on any device |
-| 🤖 **Automated** | Daily follow-up reminders via email |
-| 🔒 **Secure** | Authentication system with role-based access |
-| 📊 **Scalable** | Handles thousands of leads with ease |
+```html
+<script type="application/json" id="app-config">
+  { "apiUrl": "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec" }
+</script>
+```
 
----
+Then host `index.html` on GitHub Pages, Netlify, Vercel static hosting, or any HTTPS static host.
 
-## ✨ Features
+## User Management
 
-### 🎯 Core Features
+Run these from Apps Script:
 
-| Module | Capabilities |
-|--------|-------------|
-| **Dashboard** | Real-time stats, conversion rates, lead distribution charts |
-| **Lead Management** | Add, edit, delete, filter, search, bulk operations |
-| **Telesales Workflow** | My Leads view, call logging, follow-up scheduling, notes |
-| **Automation** | Daily email summaries, hot lead alerts, overdue reminders |
-| **Analytics** | Source tracking, conversion metrics, performance reports |
-| **Integrations** | WhatsApp click-to-chat, Google Sheets sync, email notifications |
+```js
+createUser('agent1', 'Agent 1', 'agent', 'change-this-password');
+createUser('manager', 'Manager', 'admin', 'change-this-password');
+setUserPassword('agent1', 'new-strong-password');
+```
 
-### 🚀 Advanced Features
+Roles:
 
-- 🔐 **Authentication System** - Secure login with session management
-- 🎨 **Color-coded Priorities** - Visual priority indicators (Hot: Red, Warm: Orange, Cold: Blue)
-- 📱 **Mobile Responsive** - Optimized for both desktop and mobile devices
-- 🔄 **Real-time Updates** - Instant sync with Google Sheets
-- 📧 **Email Reports** - Daily digest of follow-ups and overdue tasks
-- 🏷️ **Status Badges** - Visual status indicators with color coding
-- 🔍 **Advanced Search** - Multi-criteria filtering and search
-- 📊 **Export Capability** - Export leads to CSV/Excel
-- 🎯 **Lead Assignment** - Assign leads to specific agents
+- `admin`: view all leads, assign leads, delete leads.
+- `agent`: view and edit assigned leads only.
 
----
+## Sheet Structure
 
-## 🛠 Tech Stack
+The setup function creates:
 
-| Component | Technology | Version | Purpose |
-|-----------|------------|---------|---------|
-| **Frontend** | HTML5/CSS3/JavaScript | ES6+ | User interface and interactions |
-| **Backend** | Google Apps Script | Latest | API endpoints and business logic |
-| **Database** | Google Sheets | N/A | Data storage and management |
-| **Authentication** | Custom Session | N/A | User access control |
-| **Icons** | Font Awesome | 6.4.0 | UI icons and visual elements |
-| **Styling** | CSS3 (Flexbox/Grid) | N/A | Responsive design system |
-| **API Protocol** | RESTful | N/A | JSON-based data communication |
+- `Leads`
+- `Users`
 
----
+Do not rename headers unless you also update `CONFIG.leadHeaders` or `CONFIG.userHeaders` in `apps-script/Code.gs`.
 
-## ⚡ Quick Start
+## Security Notes
 
-Get your CRM up and running in 5 minutes:
+- Retire the old Apps Script deployment URL before going live.
+- Do not commit deployed URLs connected to real customer data in public repos.
+- Do not use the generated first admin password permanently.
+- Rotate `SESSION_SECRET` if tokens may have leaked.
+- Keep the Apps Script deployment updated after backend changes.
+- Google Apps Script web apps cannot provide the same security controls as a dedicated backend. For larger teams or sensitive data, move the API to a real server with HTTPS-only cookies, rate limiting, audit logs, and database-backed permissions.
 
-### Prerequisites
-- ✅ Google account
-- ✅ Web browser (Chrome/Firefox/Safari recommended)
-- ✅ 5 minutes of your time
+## Local Preview
 
-### 3-Step Setup
+The frontend opens directly in a browser:
 
-```bash
-# Step 1: Copy the template sheet
-# Click "Make a copy" of our Google Sheet template
+```powershell
+start .\index.html
+```
 
-# Step 2: Deploy Apps Script
-# Copy backend code → Deploy as web app
-
-# Step 3: Configure frontend
-# Replace API URL → Upload to any web server
-
-# Done! Login with admin/System
+Login requires a configured deployed API URL.
