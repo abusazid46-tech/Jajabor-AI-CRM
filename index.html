@@ -461,19 +461,58 @@
         }
 
         .icon-btn {
-            width: 40px;
-            height: 40px;
+            min-width: 42px;
+            min-height: 40px;
             border: 1px solid var(--line);
             border-radius: 8px;
             background: #fff;
             color: var(--ink);
-            display: inline-grid;
-            place-items: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 8px 10px;
+            font-size: 13px;
+            font-weight: 850;
             cursor: pointer;
         }
 
         .icon-btn:hover {
             border-color: #aab4c4;
+        }
+
+        .icon-btn span:not(.icon-label) {
+            display: inline-flex;
+        }
+
+        .icon-label {
+            line-height: 1;
+        }
+
+        .lead-actions .icon-btn {
+            flex: 1 1 112px;
+            border: 0;
+            color: #fff;
+        }
+
+        .lead-actions .action-call {
+            background: #047857;
+        }
+
+        .lead-actions .action-whatsapp {
+            background: #15803d;
+        }
+
+        .lead-actions .action-edit {
+            background: #1d4ed8;
+        }
+
+        .lead-actions .action-delete {
+            background: #b91c1c;
+        }
+
+        .lead-actions .icon-btn:hover {
+            filter: brightness(.94);
         }
 
         .empty-state,
@@ -1378,11 +1417,12 @@
 
         function iconButton(label, iconName, handler) {
             const btn = document.createElement('button');
-            btn.className = 'icon-btn';
+            const actionClass = `action-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+            btn.className = `icon-btn ${actionClass}`;
             btn.type = 'button';
             btn.setAttribute('aria-label', label);
             btn.title = label;
-            btn.append(icon(iconName));
+            btn.append(icon(iconName), el('span', 'icon-label', label));
             btn.addEventListener('click', handler);
             return btn;
         }
