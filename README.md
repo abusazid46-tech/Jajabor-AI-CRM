@@ -85,7 +85,7 @@ Mobile browsers require user-initiated calls, so this is an assisted calling que
 
 ## Admin Reports
 
-Admins can open `All Leads`, filter by status, priority, assigned agent, source, search text, and period (`daily`, `weekly`, `monthly`), then download the filtered result as a CSV report. The CSV includes a short summary plus lead-level rows.
+Admins can open `All Leads`, filter by status, priority, assigned agent, source, search text, and period (`daily`, `weekly`, `monthly`), then download the filtered result as CSV or XLS. Agents can download XLS reports from their assigned lead and follow-up views. Reports include a short summary plus lead-level rows.
 
 ## PWA Install
 

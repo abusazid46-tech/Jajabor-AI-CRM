@@ -1435,10 +1435,13 @@
             filters.append(search);
             const add = button('Add Lead', 'plus', 'btn btn-primary');
             add.addEventListener('click', () => routeTo('addLead'));
-            const download = plainActionButton('Download CSV', 'btn');
-            download.addEventListener('click', () => downloadLeadReport(getFilteredLeads(), period.value));
+            const downloadCsv = plainActionButton('Download CSV', 'btn');
+            downloadCsv.addEventListener('click', () => downloadLeadReport(getFilteredLeads(), period.value, 'csv'));
+            const downloadXls = plainActionButton('Download XLS', 'btn btn-primary');
+            downloadXls.addEventListener('click', () => downloadLeadReport(getFilteredLeads(), period.value, 'xls'));
             toolbar.append(filters, add);
-            if (isAdmin() && !isMine) toolbar.append(download);
+            if (isAdmin() && !isMine) toolbar.append(downloadCsv);
+            toolbar.append(downloadXls);
             const list = renderLeadList(leads);
             content.append(toolbar, list);
 
@@ -1481,7 +1484,7 @@
             return start;
         }
 
-        function downloadLeadReport(leads, period) {
+        function downloadLeadReport(leads, period, format = 'csv') {
             const rows = leads.map((lead) => ({
                 'Lead ID': lead['Lead ID'] || '',
                 Name: lead.Name || '',
@@ -1498,9 +1501,15 @@
                 'Last Updated': formatDateTime(lead['Last Updated'])
             }));
             const summary = buildReportSummary(leads, period);
-            const csv = toCsv(summary.concat(rows));
+            const reportRows = summary.concat(rows);
             const label = period || 'all-time';
             const date = new Date().toISOString().slice(0, 10);
+            if (format === 'xls') {
+                const xls = toExcelHtml(reportRows, `Jajabor Leads ${label} ${date}`);
+                downloadTextFile(`jajabor-leads-${label}-${date}.xls`, xls, 'application/vnd.ms-excel;charset=utf-8');
+                return;
+            }
+            const csv = toCsv(reportRows);
             downloadTextFile(`jajabor-leads-${label}-${date}.csv`, csv, 'text/csv;charset=utf-8');
         }
 
@@ -1539,10 +1548,43 @@
             return lines.join('\r\n');
         }
 
+        function toExcelHtml(rows, title) {
+            const headers = rows.length ? Object.keys(rows[0]) : [];
+            const headerCells = headers.map((header) => `<th>${htmlEscape(header)}</th>`).join('');
+            const bodyRows = rows.map((row) => `<tr>${headers.map((header) => `<td>${htmlEscape(row[header])}</td>`).join('')}</tr>`).join('');
+            return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    table { border-collapse: collapse; font-family: Arial, sans-serif; font-size: 12px; }
+    th { background: #047857; color: #fff; }
+    th, td { border: 1px solid #cbd5e1; padding: 6px 8px; vertical-align: top; }
+  </style>
+</head>
+<body>
+  <h2>${htmlEscape(title)}</h2>
+  <table>
+    <thead><tr>${headerCells}</tr></thead>
+    <tbody>${bodyRows}</tbody>
+  </table>
+</body>
+</html>`;
+        }
+
         function csvEscape(value) {
             const text = String(value ?? '');
             if (/[",\r\n]/.test(text)) return `"${text.replace(/"/g, '""')}"`;
             return text;
+        }
+
+        function htmlEscape(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
 
         function downloadTextFile(filename, content, type) {

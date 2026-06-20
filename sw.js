@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jajabor-crm-v4';
+const CACHE_NAME = 'jajabor-crm-v5';
 const APP_SHELL = [
   './',
   './index.html',
