@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-label="Jajabor AI CRM">
+  <rect width="180" height="180" rx="40" fill="#047857"/>
+  <path d="M50 112c12 18 30 28 54 28 14 0 26-3 35-10" fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round"/>
+  <path d="M55 46h72c7 0 12 5 12 12v42c0 7-5 12-12 12H95l-26 21v-21H55c-7 0-12-5-12-12V58c0-7 5-12 12-12z" fill="#ffffff"/>
+  <circle cx="73" cy="79" r="8" fill="#047857"/>
+  <circle cx="91" cy="79" r="8" fill="#047857"/>
+  <circle cx="109" cy="79" r="8" fill="#047857"/>
+</svg>

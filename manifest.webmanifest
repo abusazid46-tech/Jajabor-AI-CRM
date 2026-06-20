@@ -1,0 +1,54 @@
+{
+  "name": "Jajabor AI CRM",
+  "short_name": "Jajabor CRM",
+  "description": "Mobile telesales CRM for assigned leads, follow-ups, and assisted calling queues.",
+  "id": "/Jajabor-AI-CRM/",
+  "start_url": "/Jajabor-AI-CRM/",
+  "scope": "/Jajabor-AI-CRM/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "orientation": "portrait-primary",
+  "background_color": "#f7faf9",
+  "theme_color": "#047857",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/maskable-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "My Leads",
+      "short_name": "Leads",
+      "url": "/Jajabor-AI-CRM/#myLeads",
+      "icons": [
+        {
+          "src": "assets/icon.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Follow-ups",
+      "short_name": "Follow-ups",
+      "url": "/Jajabor-AI-CRM/#followups",
+      "icons": [
+        {
+          "src": "assets/icon.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ]
+}

@@ -22,6 +22,9 @@ apps-script/appsscript.json
 vercel.json               Security headers for Vercel hosting
 _headers                  Security headers for Netlify-style hosting
 robots.txt                Prevents crawler indexing of the CRM login
+manifest.webmanifest      PWA install metadata
+sw.js                     Offline app shell service worker
+offline.html              Offline fallback page
 README.md
 ```
 
@@ -79,6 +82,12 @@ Roles:
 Agents can open `My Leads` or `Follow-ups` and use `Auto Follow-up Mode` to work through callable assigned leads one by one. The browser opens the current lead with a `tel:` link, then the agent records the result with `No Answer + Next`, `Contacted + Next`, or `Interested + Next`; the CRM updates the lead and advances to the next number.
 
 Mobile browsers require user-initiated calls, so this is an assisted calling queue rather than a silent background dialer. Use it only for leads your team is allowed to contact.
+
+## PWA Install
+
+The CRM includes `manifest.webmanifest`, `sw.js`, an offline fallback, and local SVG icons. On Android/Chrome, open the live HTTPS URL and choose `Install app` or `Add to Home screen`. On iPhone, open the site in Safari and choose Share > Add to Home Screen.
+
+The PWA caches the app shell for faster loading. Lead data still requires network access because Google Apps Script remains the live backend.
 
 ## Sheet Structure
 
