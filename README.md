@@ -83,6 +83,10 @@ Agents can open `My Leads` or `Follow-ups` and use `Auto Follow-up Mode` to work
 
 Mobile browsers require user-initiated calls, so this is an assisted calling queue rather than a silent background dialer. Use it only for leads your team is allowed to contact.
 
+## Admin Reports
+
+Admins can open `All Leads`, filter by status, priority, assigned agent, source, search text, and period (`daily`, `weekly`, `monthly`), then download the filtered result as a CSV report. The CSV includes a short summary plus lead-level rows.
+
 ## PWA Install
 
 The CRM includes `manifest.webmanifest`, `sw.js`, an offline fallback, and local SVG icons. On Android/Chrome, open the live HTTPS URL and choose `Install app` or `Add to Home screen`. On iPhone, open the site in Safari and choose Share > Add to Home Screen.

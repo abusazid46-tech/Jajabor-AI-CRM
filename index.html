@@ -1412,6 +1412,7 @@
 
         function renderLeads(leads, isMine, options = {}) {
             const content = qs('#pageContent');
+            const baseLeads = leads.slice();
             content.replaceChildren();
             if (options.autoMode) {
                 content.append(renderAutoFollowupPanel(leads, options.sourcePage));
@@ -1419,31 +1420,141 @@
             const toolbar = el('div', 'card toolbar');
             const filters = el('div', 'filter-row');
             const status = selectInput('', [''].concat(state.options.statuses), 'All Status');
+            const priority = selectInput('', [''].concat(state.options.priorities), 'All Priority');
+            const assignedTo = selectInput('', [''].concat(state.options.users), 'All Agents');
+            const sourceFilter = selectInput('', [''].concat(state.options.sources), 'All Sources');
+            const period = selectInput('', ['', 'daily', 'weekly', 'monthly'], 'All Time');
             const search = document.createElement('input');
             search.className = 'input';
             search.placeholder = 'Search name or phone';
             search.type = 'search';
-            filters.append(status, search);
+            filters.append(status);
+            if (isAdmin() && !isMine) {
+                filters.append(priority, assignedTo, sourceFilter, period);
+            }
+            filters.append(search);
             const add = button('Add Lead', 'plus', 'btn btn-primary');
             add.addEventListener('click', () => routeTo('addLead'));
+            const download = plainActionButton('Download CSV', 'btn');
+            download.addEventListener('click', () => downloadLeadReport(getFilteredLeads(), period.value));
             toolbar.append(filters, add);
-            content.append(toolbar, renderLeadList(leads));
+            if (isAdmin() && !isMine) toolbar.append(download);
+            const list = renderLeadList(leads);
+            content.append(toolbar, list);
+
+            const getFilteredLeads = () => {
+                const source = baseLeads;
+                const term = search.value.trim().toLowerCase();
+                return source.filter((lead) => {
+                    const matchesStatus = !status.value || lead.Status === status.value;
+                    const matchesPriority = !priority.value || lead.Priority === priority.value;
+                    const matchesAgent = !assignedTo.value || lead['Assigned To'] === assignedTo.value;
+                    const matchesSource = !sourceFilter.value || lead.Source === sourceFilter.value;
+                    const matchesPeriod = !period.value || leadMatchesPeriod(lead, period.value);
+                    const matchesTerm = !term || [lead.Name, lead.Phone, lead['Assigned To']].some((value) => String(value || '').toLowerCase().includes(term));
+                    return matchesStatus && matchesPriority && matchesAgent && matchesSource && matchesPeriod && matchesTerm;
+                });
+            };
 
             const apply = () => {
-                const source = isMine ? filterMyLeads(state.leads) : state.leads;
-                const term = search.value.trim().toLowerCase();
-                const filtered = source.filter((lead) => {
-                    const matchesStatus = !status.value || lead.Status === status.value;
-                    const matchesTerm = !term || [lead.Name, lead.Phone, lead['Assigned To']].some((value) => String(value || '').toLowerCase().includes(term));
-                    return matchesStatus && matchesTerm;
-                });
+                const filtered = getFilteredLeads();
                 if (options.autoMode) {
                     content.firstElementChild.replaceWith(renderAutoFollowupPanel(filtered, options.sourcePage));
                 }
                 content.lastElementChild.replaceWith(renderLeadList(filtered));
             };
-            status.addEventListener('change', apply);
+            [status, priority, assignedTo, sourceFilter, period].forEach((control) => control.addEventListener('change', apply));
             search.addEventListener('input', debounce(apply, 160));
+        }
+
+        function leadMatchesPeriod(lead, period) {
+            const date = new Date(lead['Date Added'] || lead['Last Updated'] || lead['Next Follow-up Date'] || 0);
+            if (Number.isNaN(date.getTime())) return false;
+            return date >= getPeriodStart(period);
+        }
+
+        function getPeriodStart(period) {
+            const start = new Date();
+            start.setHours(0, 0, 0, 0);
+            if (period === 'weekly') start.setDate(start.getDate() - 6);
+            if (period === 'monthly') start.setMonth(start.getMonth() - 1);
+            return start;
+        }
+
+        function downloadLeadReport(leads, period) {
+            const rows = leads.map((lead) => ({
+                'Lead ID': lead['Lead ID'] || '',
+                Name: lead.Name || '',
+                Phone: formatPhoneNumber(lead.Phone) || lead.Phone || '',
+                Source: lead.Source || '',
+                Status: lead.Status || '',
+                Priority: lead.Priority || '',
+                'Assigned To': lead['Assigned To'] || '',
+                'Date Added': formatDateTime(lead['Date Added']),
+                'Last Call Date': formatDateTime(lead['Last Call Date']),
+                'Next Follow-up Date': formatDateTime(lead['Next Follow-up Date']),
+                Remarks: lead.Remarks || '',
+                'Created By': lead['Created By'] || '',
+                'Last Updated': formatDateTime(lead['Last Updated'])
+            }));
+            const summary = buildReportSummary(leads, period);
+            const csv = toCsv(summary.concat(rows));
+            const label = period || 'all-time';
+            const date = new Date().toISOString().slice(0, 10);
+            downloadTextFile(`jajabor-leads-${label}-${date}.csv`, csv, 'text/csv;charset=utf-8');
+        }
+
+        function buildReportSummary(leads, period) {
+            const byStatus = countValues(leads, 'Status');
+            const byPriority = countValues(leads, 'Priority');
+            const byAgent = countValues(leads, 'Assigned To');
+            return [
+                { 'Lead ID': 'Report Period', Name: period || 'All Time', Phone: '', Source: '', Status: '', Priority: '', 'Assigned To': '', 'Date Added': '', 'Last Call Date': '', 'Next Follow-up Date': '', Remarks: '', 'Created By': '', 'Last Updated': '' },
+                { 'Lead ID': 'Total Leads', Name: leads.length, Phone: '', Source: '', Status: JSON.stringify(byStatus), Priority: JSON.stringify(byPriority), 'Assigned To': JSON.stringify(byAgent), 'Date Added': '', 'Last Call Date': '', 'Next Follow-up Date': '', Remarks: '', 'Created By': '', 'Last Updated': '' },
+                { 'Lead ID': '', Name: '', Phone: '', Source: '', Status: '', Priority: '', 'Assigned To': '', 'Date Added': '', 'Last Call Date': '', 'Next Follow-up Date': '', Remarks: '', 'Created By': '', 'Last Updated': '' }
+            ];
+        }
+
+        function countValues(rows, key) {
+            return rows.reduce((acc, row) => {
+                const value = row[key] || 'Unknown';
+                acc[value] = (acc[value] || 0) + 1;
+                return acc;
+            }, {});
+        }
+
+        function formatDateTime(value) {
+            if (!value) return '';
+            const date = new Date(value);
+            return Number.isNaN(date.getTime()) ? '' : date.toLocaleString();
+        }
+
+        function toCsv(rows) {
+            if (!rows.length) return '';
+            const headers = Object.keys(rows[0]);
+            const lines = [headers.join(',')];
+            rows.forEach((row) => {
+                lines.push(headers.map((header) => csvEscape(row[header])).join(','));
+            });
+            return lines.join('\r\n');
+        }
+
+        function csvEscape(value) {
+            const text = String(value ?? '');
+            if (/[",\r\n]/.test(text)) return `"${text.replace(/"/g, '""')}"`;
+            return text;
+        }
+
+        function downloadTextFile(filename, content, type) {
+            const blob = new Blob([content], { type });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.append(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
         }
 
         function renderAutoFollowupPanel(leads, sourcePage) {
