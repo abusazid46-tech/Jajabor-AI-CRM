@@ -534,6 +534,45 @@
             filter: brightness(.94);
         }
 
+        .auto-panel {
+            padding: 14px;
+            display: grid;
+            gap: 12px;
+            border-color: #86efac;
+            background: linear-gradient(135deg, #ecfdf5 0%, #eff6ff 100%);
+        }
+
+        .auto-panel-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .auto-panel h3 {
+            font-size: 17px;
+        }
+
+        .auto-status {
+            display: grid;
+            gap: 4px;
+        }
+
+        .auto-current {
+            font-weight: 900;
+            color: #064e3b;
+        }
+
+        .auto-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .auto-controls .btn {
+            flex: 1 1 150px;
+        }
+
         .empty-state,
         .loading-state {
             min-height: 160px;
@@ -727,6 +766,15 @@
             .lead-actions {
                 display: grid;
                 grid-template-columns: repeat(4, 1fr);
+            }
+
+            .auto-panel-head {
+                display: grid;
+            }
+
+            .auto-controls {
+                display: grid;
+                grid-template-columns: 1fr;
             }
 
             .icon-btn {
@@ -925,6 +973,7 @@
 
     <script>
         const STORAGE_KEY = 'jajaborCrmSession';
+        const LIVE_REFRESH_MS = 30000;
         const FALLBACK_OPTIONS = {
             statuses: ['New', 'Contacted', 'Interested', 'Not Interested', 'Callback Later', 'Closed'],
             priorities: ['Hot', 'Warm', 'Cold'],
@@ -948,7 +997,14 @@
             stats: null,
             followups: [],
             page: 'dashboard',
-            busy: false
+            busy: false,
+            refreshTimer: 0,
+            autoFollowup: {
+                active: false,
+                queue: [],
+                index: 0,
+                sourcePage: 'followups'
+            }
         };
 
         const qs = (selector, root = document) => root.querySelector(selector);
@@ -1145,6 +1201,7 @@
             if (!canAccessPage(state.page) || !isAdmin()) {
                 state.page = getDefaultPage();
             }
+            startLiveRefresh();
             renderNav();
             routeTo(state.page);
         }
@@ -1185,9 +1242,9 @@
             renderNav();
             if (item.page === 'dashboard') renderDashboard();
             if (item.page === 'leads') renderLeads(state.leads, false);
-            if (item.page === 'myLeads') renderLeads(filterMyLeads(state.leads), true);
+            if (item.page === 'myLeads') renderLeads(filterMyLeads(state.leads), true, { autoMode: true, sourcePage: 'myLeads' });
             if (item.page === 'addLead') renderAddLead();
-            if (item.page === 'followups') renderLeads(state.followups, false);
+            if (item.page === 'followups') renderLeads(state.followups, false, { autoMode: true, sourcePage: 'followups' });
         }
 
         function renderDashboard() {
@@ -1224,9 +1281,12 @@
             return toolbar;
         }
 
-        function renderLeads(leads, isMine) {
+        function renderLeads(leads, isMine, options = {}) {
             const content = qs('#pageContent');
             content.replaceChildren();
+            if (options.autoMode) {
+                content.append(renderAutoFollowupPanel(leads, options.sourcePage));
+            }
             const toolbar = el('div', 'card toolbar');
             const filters = el('div', 'filter-row');
             const status = selectInput('', [''].concat(state.options.statuses), 'All Status');
@@ -1248,10 +1308,123 @@
                     const matchesTerm = !term || [lead.Name, lead.Phone, lead['Assigned To']].some((value) => String(value || '').toLowerCase().includes(term));
                     return matchesStatus && matchesTerm;
                 });
+                if (options.autoMode) {
+                    content.firstElementChild.replaceWith(renderAutoFollowupPanel(filtered, options.sourcePage));
+                }
                 content.lastElementChild.replaceWith(renderLeadList(filtered));
             };
             status.addEventListener('change', apply);
             search.addEventListener('input', debounce(apply, 160));
+        }
+
+        function renderAutoFollowupPanel(leads, sourcePage) {
+            const panel = el('section', 'card auto-panel');
+            const queue = getCallableQueue(leads);
+            const active = state.autoFollowup.active && state.autoFollowup.sourcePage === sourcePage;
+            const current = active ? state.autoFollowup.queue[state.autoFollowup.index] : queue[0];
+            const doneCount = active ? Math.min(state.autoFollowup.index, state.autoFollowup.queue.length) : 0;
+            const total = active ? state.autoFollowup.queue.length : queue.length;
+
+            const head = el('div', 'auto-panel-head');
+            const status = el('div', 'auto-status');
+            status.append(el('h3', '', 'Auto Follow-up Mode'));
+            status.append(el('p', 'subtle', 'Dials assigned follow-up numbers one by one after each call result.'));
+            status.append(el('div', 'auto-current', current ? `${current.Name || 'Unnamed Lead'} - ${formatPhoneNumber(current.Phone)}` : 'No callable follow-ups in this view.'));
+            head.append(status, badge(active ? `${doneCount + 1}/${total}` : `${total} queued`, active ? 'badge-ok' : ''));
+
+            const controls = el('div', 'auto-controls');
+            const start = button(active ? 'Dial Current' : 'Start Queue', 'phone', 'btn btn-primary');
+            start.disabled = !current;
+            start.addEventListener('click', () => {
+                if (!active) startAutoFollowup(queue, sourcePage);
+                dialCurrentFollowup();
+            });
+            const noAnswer = plainActionButton('No Answer + Next', 'btn');
+            noAnswer.disabled = !active || !current;
+            noAnswer.addEventListener('click', () => completeAutoFollowup('Callback Later', 1, 'No answer'));
+            const contacted = plainActionButton('Contacted + Next', 'btn');
+            contacted.disabled = !active || !current;
+            contacted.addEventListener('click', () => completeAutoFollowup('Contacted', 2, 'Contacted'));
+            const interested = plainActionButton('Interested + Next', 'btn btn-primary');
+            interested.disabled = !active || !current;
+            interested.addEventListener('click', () => completeAutoFollowup('Interested', 1, 'Interested'));
+            const stop = plainActionButton('Stop', 'btn btn-danger');
+            stop.disabled = !active;
+            stop.addEventListener('click', stopAutoFollowup);
+            controls.append(start, noAnswer, contacted, interested, stop);
+            panel.append(head, controls);
+            return panel;
+        }
+
+        function getCallableQueue(leads) {
+            return leads
+                .filter((lead) => lead.Status !== 'Closed')
+                .filter((lead) => formatPhoneNumber(lead.Phone))
+                .sort((a, b) => new Date(a['Next Follow-up Date'] || 0) - new Date(b['Next Follow-up Date'] || 0));
+        }
+
+        function startAutoFollowup(queue, sourcePage) {
+            state.autoFollowup = {
+                active: true,
+                queue: queue.slice(),
+                index: 0,
+                sourcePage
+            };
+            routeTo(sourcePage);
+        }
+
+        function stopAutoFollowup() {
+            state.autoFollowup.active = false;
+            state.autoFollowup.queue = [];
+            state.autoFollowup.index = 0;
+            showToast('Auto follow-up stopped.', 'warning');
+            routeTo(state.page);
+        }
+
+        function dialCurrentFollowup() {
+            const lead = state.autoFollowup.queue[state.autoFollowup.index];
+            if (!lead) {
+                stopAutoFollowup();
+                return;
+            }
+            callPhone(lead.Phone);
+        }
+
+        async function completeAutoFollowup(status, daysToNextFollowup, note) {
+            const lead = state.autoFollowup.queue[state.autoFollowup.index];
+            if (!lead) return;
+            const nextDate = new Date();
+            nextDate.setDate(nextDate.getDate() + daysToNextFollowup);
+            const remarks = [lead.Remarks, `${new Date().toLocaleString()}: ${note}`].filter(Boolean).join('\n');
+            const payload = {
+                leadId: lead['Lead ID'],
+                name: lead.Name,
+                phone: formatPhoneNumber(lead.Phone),
+                source: lead.Source || state.options.sources[0],
+                status,
+                priority: lead.Priority || state.options.priorities[0],
+                assignedTo: lead['Assigned To'] || state.currentUser.username,
+                nextFollowupDate: nextDate.toISOString().slice(0, 10),
+                remarks
+            };
+            try {
+                setBusy(true);
+                await api('updateLead', { lead: payload });
+                state.autoFollowup.index += 1;
+                await bootstrapData();
+                if (state.autoFollowup.index >= state.autoFollowup.queue.length) {
+                    state.autoFollowup.active = false;
+                    showToast('Auto follow-up queue complete.');
+                    routeTo(state.autoFollowup.sourcePage);
+                    return;
+                }
+                routeTo(state.autoFollowup.sourcePage);
+                dialCurrentFollowup();
+            } catch (error) {
+                showToast(error.message, 'error');
+            } finally {
+                setBusy(false);
+            }
         }
 
         function filterMyLeads(leads) {
@@ -1443,7 +1616,27 @@
             if (notify) showToast('CRM refreshed.');
         }
 
+        function startLiveRefresh() {
+            stopLiveRefresh();
+            state.refreshTimer = window.setInterval(async () => {
+                if (!state.currentUser || state.busy || qs('#leadModal').classList.contains('is-open')) return;
+                try {
+                    await refreshData(false);
+                } catch (error) {
+                    console.warn('Live refresh failed', error);
+                }
+            }, LIVE_REFRESH_MS);
+        }
+
+        function stopLiveRefresh() {
+            if (state.refreshTimer) {
+                window.clearInterval(state.refreshTimer);
+                state.refreshTimer = 0;
+            }
+        }
+
         function logout(notify = true) {
+            stopLiveRefresh();
             clearSession();
             showLogin();
             if (notify) showToast('Logged out.');
@@ -1461,6 +1654,14 @@
             btn.className = className;
             btn.type = 'button';
             btn.append(icon(iconName), document.createTextNode(label));
+            return btn;
+        }
+
+        function plainActionButton(label, className = 'btn') {
+            const btn = document.createElement('button');
+            btn.className = className;
+            btn.type = 'button';
+            btn.textContent = label;
             return btn;
         }
 

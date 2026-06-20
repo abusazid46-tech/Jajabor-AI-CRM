@@ -74,6 +74,12 @@ Roles:
 - `admin`: view all leads, assign leads, delete leads.
 - `agent`: view and edit assigned leads only.
 
+## Auto Follow-up Mode
+
+Agents can open `My Leads` or `Follow-ups` and use `Auto Follow-up Mode` to work through callable assigned leads one by one. The browser opens the current lead with a `tel:` link, then the agent records the result with `No Answer + Next`, `Contacted + Next`, or `Interested + Next`; the CRM updates the lead and advances to the next number.
+
+Mobile browsers require user-initiated calls, so this is an assisted calling queue rather than a silent background dialer. Use it only for leads your team is allowed to contact.
+
 ## Sheet Structure
 
 The setup function creates:
