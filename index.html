@@ -1620,19 +1620,115 @@
             const content = qs('#pageContent');
             content.replaceChildren();
             const card = el('section', 'card form-card');
-            const form = qs('#leadForm').cloneNode(true);
-            form.id = 'newLeadForm';
+            const form = buildAddLeadForm();
             card.append(form);
             content.append(card);
             fillLeadFormOptions(form);
+            getLeadField(form, 'status').value = 'New';
+            getLeadField(form, 'priority').value = state.options.priorities.includes('Warm') ? 'Warm' : state.options.priorities[0];
+            getLeadField(form, 'source').value = state.options.sources.includes('Manual') ? 'Manual' : state.options.sources[0];
+            getLeadField(form, 'assignedTo').value = isAdmin() ? 'Unassigned' : state.currentUser.username;
             form.addEventListener('submit', (event) => submitLeadForm(event, form));
         }
 
+        function buildAddLeadForm() {
+            const form = el('form', 'form-grid');
+            form.id = 'addLeadForm';
+            form.autocomplete = 'off';
+            form.append(hiddenLeadField('leadId'));
+            form.append(textLeadField('name', 'Name', 'text', true, 'Customer name'));
+            form.append(textLeadField('phone', 'Phone', 'tel', true, '10 digit mobile number'));
+            form.append(selectLeadField('source', 'Source'));
+            form.append(selectLeadField('status', 'Status'));
+            form.append(selectLeadField('priority', 'Priority'));
+            form.append(selectLeadField('assignedTo', 'Assigned To'));
+            form.append(textLeadField('nextFollowup', 'Next Follow-up', 'date', false, ''));
+            form.append(textareaLeadField('remarks', 'Remarks'));
+            const submit = el('button', 'btn btn-primary field-wide', 'Save Lead');
+            submit.type = 'submit';
+            form.append(submit);
+            return form;
+        }
+
+        function hiddenLeadField(name) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.dataset.field = name;
+            return input;
+        }
+
+        function textLeadField(name, label, type, required, placeholder) {
+            const id = `addLead-${name}`;
+            const wrap = el('div', 'field');
+            if (name === 'nextFollowup') wrap.classList.add('field-wide');
+            const labelNode = document.createElement('label');
+            labelNode.setAttribute('for', id);
+            labelNode.textContent = label;
+            const input = document.createElement('input');
+            input.className = 'input';
+            input.id = id;
+            input.type = type;
+            input.dataset.field = name;
+            if (type === 'tel') {
+                input.inputMode = 'numeric';
+                input.pattern = '[0-9]{10}';
+                input.maxLength = 10;
+            }
+            if (placeholder) input.placeholder = placeholder;
+            if (required) input.required = true;
+            wrap.append(labelNode, input);
+            return wrap;
+        }
+
+        function selectLeadField(name, label) {
+            const id = `addLead-${name}`;
+            const wrap = el('div', 'field');
+            const labelNode = document.createElement('label');
+            labelNode.setAttribute('for', id);
+            labelNode.textContent = label;
+            const select = document.createElement('select');
+            select.className = 'select';
+            select.id = id;
+            select.dataset.field = name;
+            wrap.append(labelNode, select);
+            return wrap;
+        }
+
+        function textareaLeadField(name, label) {
+            const id = `addLead-${name}`;
+            const wrap = el('div', 'field field-wide');
+            const labelNode = document.createElement('label');
+            labelNode.setAttribute('for', id);
+            labelNode.textContent = label;
+            const textarea = document.createElement('textarea');
+            textarea.className = 'textarea';
+            textarea.id = id;
+            textarea.dataset.field = name;
+            textarea.maxLength = 500;
+            wrap.append(labelNode, textarea);
+            return wrap;
+        }
+
         function fillLeadFormOptions(root = document) {
-            setSelectOptions(qs('#leadSource', root), state.options.sources);
-            setSelectOptions(qs('#leadStatus', root), state.options.statuses);
-            setSelectOptions(qs('#leadPriority', root), state.options.priorities);
-            setSelectOptions(qs('#leadAssignedTo', root), state.options.users);
+            setSelectOptions(getLeadField(root, 'source'), state.options.sources);
+            setSelectOptions(getLeadField(root, 'status'), state.options.statuses);
+            setSelectOptions(getLeadField(root, 'priority'), state.options.priorities);
+            setSelectOptions(getLeadField(root, 'assignedTo'), state.options.users);
+        }
+
+        function getLeadField(root, name) {
+            const selectors = {
+                leadId: '[data-field="leadId"], #leadId',
+                name: '[data-field="name"], #leadName',
+                phone: '[data-field="phone"], #leadPhone',
+                source: '[data-field="source"], #leadSource',
+                status: '[data-field="status"], #leadStatus',
+                priority: '[data-field="priority"], #leadPriority',
+                assignedTo: '[data-field="assignedTo"], #leadAssignedTo',
+                nextFollowup: '[data-field="nextFollowup"], #leadNextFollowup',
+                remarks: '[data-field="remarks"], #leadRemarks'
+            };
+            return qs(selectors[name], root);
         }
 
         function setSelectOptions(select, values) {
@@ -1675,22 +1771,22 @@
 
         async function submitLeadForm(event, form = qs('#leadForm')) {
             event.preventDefault();
-            const phone = formatPhoneNumber(qs('#leadPhone', form).value);
+            const phone = formatPhoneNumber(getLeadField(form, 'phone').value);
             if (!phone) {
                 showToast('Enter a valid 10 digit phone number.', 'error');
                 return;
             }
-            const leadId = qs('#leadId', form)?.value || '';
+            const leadId = getLeadField(form, 'leadId')?.value || '';
             const payload = {
                 leadId,
-                name: qs('#leadName', form).value.trim(),
+                name: getLeadField(form, 'name').value.trim(),
                 phone,
-                source: qs('#leadSource', form).value,
-                status: qs('#leadStatus', form).value,
-                priority: qs('#leadPriority', form).value,
-                assignedTo: qs('#leadAssignedTo', form).value,
-                nextFollowupDate: qs('#leadNextFollowup', form).value,
-                remarks: qs('#leadRemarks', form).value.trim()
+                source: getLeadField(form, 'source').value,
+                status: getLeadField(form, 'status').value,
+                priority: getLeadField(form, 'priority').value,
+                assignedTo: getLeadField(form, 'assignedTo').value,
+                nextFollowupDate: getLeadField(form, 'nextFollowup').value,
+                remarks: getLeadField(form, 'remarks').value.trim()
             };
             try {
                 setBusy(true);
