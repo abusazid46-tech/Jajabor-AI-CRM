@@ -1076,6 +1076,7 @@
             busy: false,
             refreshTimer: 0,
             installPromptEvent: null,
+            leadDraft: null,
             autoFollowup: {
                 active: false,
                 queue: [],
@@ -1628,6 +1629,13 @@
             getLeadField(form, 'priority').value = state.options.priorities.includes('Warm') ? 'Warm' : state.options.priorities[0];
             getLeadField(form, 'source').value = state.options.sources.includes('Manual') ? 'Manual' : state.options.sources[0];
             getLeadField(form, 'assignedTo').value = isAdmin() ? 'Unassigned' : state.currentUser.username;
+            applyLeadDraft(form);
+            form.addEventListener('input', () => {
+                state.leadDraft = readLeadForm(form);
+            });
+            form.addEventListener('change', () => {
+                state.leadDraft = readLeadForm(form);
+            });
             form.addEventListener('submit', (event) => submitLeadForm(event, form));
         }
 
@@ -1731,6 +1739,32 @@
             return qs(selectors[name], root);
         }
 
+        function readLeadForm(form) {
+            return {
+                leadId: getLeadField(form, 'leadId')?.value || '',
+                name: getLeadField(form, 'name')?.value || '',
+                phone: getLeadField(form, 'phone')?.value || '',
+                source: getLeadField(form, 'source')?.value || '',
+                status: getLeadField(form, 'status')?.value || '',
+                priority: getLeadField(form, 'priority')?.value || '',
+                assignedTo: getLeadField(form, 'assignedTo')?.value || '',
+                nextFollowup: getLeadField(form, 'nextFollowup')?.value || '',
+                remarks: getLeadField(form, 'remarks')?.value || ''
+            };
+        }
+
+        function applyLeadDraft(form) {
+            if (!state.leadDraft) return;
+            Object.entries(state.leadDraft).forEach(([name, value]) => {
+                const field = getLeadField(form, name);
+                if (field) field.value = value;
+            });
+        }
+
+        function isLeadFormActive() {
+            return state.page === 'addLead' || Boolean(document.activeElement?.closest?.('#addLeadForm, #leadForm'));
+        }
+
         function setSelectOptions(select, values) {
             if (!select) return;
             const current = select.value;
@@ -1792,6 +1826,7 @@
                 setBusy(true);
                 await api(leadId ? 'updateLead' : 'addLead', { lead: payload });
                 showToast(leadId ? 'Lead updated.' : 'Lead added.');
+                if (!leadId) state.leadDraft = null;
                 await refreshData(false);
                 closeModal();
                 routeTo(isAdmin() ? 'leads' : 'myLeads');
@@ -1834,18 +1869,20 @@
             window.open(`https://wa.me/91${formatted}`, '_blank', 'noopener,noreferrer');
         }
 
-        async function refreshData(notify = true) {
+        async function refreshData(notify = true, render = true) {
             await bootstrapData();
-            routeTo(state.page);
+            if (render && !isLeadFormActive()) {
+                routeTo(state.page);
+            }
             if (notify) showToast('CRM refreshed.');
         }
 
         function startLiveRefresh() {
             stopLiveRefresh();
             state.refreshTimer = window.setInterval(async () => {
-                if (!state.currentUser || state.busy || qs('#leadModal').classList.contains('is-open')) return;
+                if (!state.currentUser || state.busy || qs('#leadModal').classList.contains('is-open') || state.page === 'addLead') return;
                 try {
-                    await refreshData(false);
+                    await refreshData(false, false);
                 } catch (error) {
                     console.warn('Live refresh failed', error);
                 }
