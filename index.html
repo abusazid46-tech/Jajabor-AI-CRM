@@ -1450,9 +1450,7 @@
             search.placeholder = 'Search name or phone';
             search.type = 'search';
             filters.append(status);
-            if (isAdmin() && !isMine) {
-                filters.append(priority, assignedTo, sourceFilter, period);
-            }
+            filters.append(priority, assignedTo, sourceFilter, period);
             filters.append(search);
             const add = button('Add Lead', 'plus', 'btn btn-primary');
             add.addEventListener('click', () => routeTo('addLead'));
