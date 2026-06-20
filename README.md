@@ -87,6 +87,8 @@ Mobile browsers require user-initiated calls, so this is an assisted calling que
 
 The CRM includes `manifest.webmanifest`, `sw.js`, an offline fallback, and local SVG icons. On Android/Chrome, open the live HTTPS URL and choose `Install app` or `Add to Home screen`. On iPhone, open the site in Safari and choose Share > Add to Home Screen.
 
+The app also shows an in-app install prompt. Chrome/Android can open the native install dialog; iPhone shows the Safari Add to Home Screen instruction because iOS does not expose a native web install prompt event.
+
 The PWA caches the app shell for faster loading. Lead data still requires network access because Google Apps Script remains the live backend.
 
 ## Sheet Structure

@@ -668,6 +668,53 @@
             background: var(--warn);
         }
 
+        .install-prompt {
+            position: fixed;
+            left: 18px;
+            right: 18px;
+            bottom: 18px;
+            z-index: 70;
+            display: none;
+            grid-template-columns: minmax(0, 1fr) auto auto;
+            align-items: center;
+            gap: 10px;
+            max-width: 620px;
+            margin: 0 auto;
+            border: 1px solid #86efac;
+            border-radius: 8px;
+            background: #ffffff;
+            box-shadow: var(--shadow);
+            padding: 12px;
+        }
+
+        .install-prompt.is-visible {
+            display: grid;
+        }
+
+        .install-prompt strong {
+            display: block;
+            font-size: 14px;
+        }
+
+        .install-prompt p {
+            margin-top: 2px;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.35;
+        }
+
+        .install-close {
+            width: 38px;
+            height: 38px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+            color: var(--ink);
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+        }
+
         .bottom-tabs {
             display: none;
         }
@@ -812,6 +859,16 @@
 
             .toast {
                 min-width: 0;
+                width: 100%;
+            }
+
+            .install-prompt {
+                bottom: calc(86px + var(--safe-bottom));
+                grid-template-columns: minmax(0, 1fr) auto;
+            }
+
+            .install-prompt .btn {
+                grid-column: 1 / -1;
                 width: 100%;
             }
 
@@ -978,8 +1035,20 @@
 
     <div id="toastStack" class="toast-stack"></div>
 
+    <div id="installPrompt" class="install-prompt" role="dialog" aria-live="polite" aria-label="Install Jajabor CRM">
+        <div>
+            <strong id="installTitle">Install Jajabor CRM</strong>
+            <p id="installText">Add this CRM to your home screen for faster mobile access.</p>
+        </div>
+        <button class="btn btn-primary" id="installBtn" type="button">Install</button>
+        <button class="install-close" id="installDismissBtn" type="button" aria-label="Dismiss install prompt">
+            <span data-icon-slot="x"></span>
+        </button>
+    </div>
+
     <script>
         const STORAGE_KEY = 'jajaborCrmSession';
+        const INSTALL_DISMISSED_KEY = 'jajaborInstallDismissedAt';
         const LIVE_REFRESH_MS = 30000;
         const FALLBACK_OPTIONS = {
             statuses: ['New', 'Contacted', 'Interested', 'Not Interested', 'Callback Later', 'Closed'],
@@ -1006,6 +1075,7 @@
             page: window.location.hash ? window.location.hash.slice(1) : 'dashboard',
             busy: false,
             refreshTimer: 0,
+            installPromptEvent: null,
             autoFollowup: {
                 active: false,
                 queue: [],
@@ -1175,6 +1245,54 @@
             toast.textContent = message;
             qs('#toastStack').append(toast);
             setTimeout(() => toast.remove(), 3200);
+        }
+
+        function isStandaloneApp() {
+            return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        }
+
+        function installPromptDismissedRecently() {
+            const dismissedAt = Number(localStorage.getItem(INSTALL_DISMISSED_KEY) || 0);
+            return dismissedAt && Date.now() - dismissedAt < 7 * 24 * 60 * 60 * 1000;
+        }
+
+        function showInstallPrompt(mode = 'native') {
+            if (isStandaloneApp() || installPromptDismissedRecently()) return;
+            const prompt = qs('#installPrompt');
+            const text = qs('#installText');
+            const button = qs('#installBtn');
+            if (mode === 'ios') {
+                text.textContent = 'On iPhone, tap Share, then Add to Home Screen.';
+                button.textContent = 'How to Install';
+            } else {
+                text.textContent = 'Add this CRM to your home screen for faster mobile access.';
+                button.textContent = 'Install';
+            }
+            prompt.dataset.mode = mode;
+            prompt.classList.add('is-visible');
+        }
+
+        function hideInstallPrompt(remember = false) {
+            qs('#installPrompt').classList.remove('is-visible');
+            if (remember) {
+                localStorage.setItem(INSTALL_DISMISSED_KEY, String(Date.now()));
+            }
+        }
+
+        async function runInstallPrompt() {
+            const mode = qs('#installPrompt').dataset.mode;
+            if (state.installPromptEvent) {
+                state.installPromptEvent.prompt();
+                const choice = await state.installPromptEvent.userChoice;
+                state.installPromptEvent = null;
+                hideInstallPrompt(choice.outcome === 'dismissed');
+                return;
+            }
+            if (mode === 'ios') {
+                showToast('Tap Share, then Add to Home Screen.', 'warning');
+                return;
+            }
+            showToast('Use your browser menu to install this app.', 'warning');
         }
 
         function setBusy(isBusy) {
@@ -1739,12 +1857,30 @@
         qs('#logoutBtn').addEventListener('click', () => logout(true));
         qs('#mobileLogoutBtn').addEventListener('click', () => logout(true));
         qs('#refreshBtn').addEventListener('click', () => refreshData(true).catch((error) => showToast(error.message, 'error')));
+        qs('#installBtn').addEventListener('click', () => runInstallPrompt());
+        qs('#installDismissBtn').addEventListener('click', () => hideInstallPrompt(true));
+
+        window.addEventListener('beforeinstallprompt', (event) => {
+            event.preventDefault();
+            state.installPromptEvent = event;
+            showInstallPrompt('native');
+        });
+
+        window.addEventListener('appinstalled', () => {
+            state.installPromptEvent = null;
+            hideInstallPrompt(true);
+            showToast('Jajabor CRM installed.');
+        });
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js').catch((error) => {
                     console.warn('Service worker registration failed', error);
                 });
+                const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent);
+                if (isIos && !isStandaloneApp()) {
+                    window.setTimeout(() => showInstallPrompt('ios'), 1200);
+                }
             });
         }
 
