@@ -398,22 +398,29 @@
         .toolbar {
             display: flex;
             flex-wrap: wrap;
-            align-items: center;
+            align-items: stretch;
             justify-content: space-between;
-            gap: 10px;
+            gap: 12px;
             padding: 14px;
         }
 
         .filter-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 12px;
+            flex: 1 1 720px;
+            min-width: min(100%, 520px);
         }
 
         .filter-row .input,
         .filter-row .select {
-            max-width: 230px;
+            min-width: 0;
+            max-width: none;
+        }
+
+        .toolbar > .btn {
+            flex: 0 0 auto;
+            min-width: 148px;
         }
 
         .lead-list {
@@ -802,6 +809,8 @@
             }
 
             .filter-row {
+                grid-template-columns: 1fr;
+                min-width: 0;
                 width: 100%;
             }
 
