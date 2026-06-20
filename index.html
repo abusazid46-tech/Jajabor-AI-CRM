@@ -418,6 +418,11 @@
             max-width: none;
         }
 
+        .agent-filter-row {
+            grid-template-columns: minmax(260px, 340px) minmax(360px, 1fr);
+            flex-basis: 100%;
+        }
+
         .toolbar > .btn {
             flex: 0 0 auto;
             min-width: 148px;
@@ -812,6 +817,10 @@
                 grid-template-columns: 1fr;
                 min-width: 0;
                 width: 100%;
+            }
+
+            .agent-filter-row {
+                grid-template-columns: 1fr;
             }
 
             .filter-row .input,
@@ -1428,6 +1437,9 @@
             }
             const toolbar = el('div', 'card toolbar');
             const filters = el('div', 'filter-row');
+            if (!isAdmin() || isMine) {
+                filters.classList.add('agent-filter-row');
+            }
             const status = selectInput('', [''].concat(state.options.statuses), 'All Status');
             const priority = selectInput('', [''].concat(state.options.priorities), 'All Priority');
             const assignedTo = selectInput('', [''].concat(state.options.users), 'All Agents');
